@@ -1,0 +1,25 @@
+{
+  "_schema": "PhasePacket v1.1.0",
+  "_description": "Written by each phase agent to .sdlc/phases/{work-item-id}/{phase}.json",
+  "work_item_id": "",
+  "skill_id": "",
+  "work_type": null,
+  "phase": "intake",
+  "timestamp": "",
+  "input_artifact_version_ids": [],
+  "output_artifact_version_ids": [],
+  "decision_ids": [],
+  "evidence_ids": [],
+  "gate_status": "auto-pass",
+  "artifact_gaps": [],
+  "artifact_policy_applied": {
+    "active_scope": null,
+    "baseline_source": null,
+    "work_type_source": null,
+    "resolution_order": []
+  },
+  "open_questions": [],
+  "risk_flags": [],
+  "recommended_next_phase": null,
+  "skip_phases": []
+}

@@ -1,0 +1,14 @@
+{
+  "_schema": "Decision v1.0.0",
+  "_description": "Copy to .sdlc/decisions/{id}.json. Record every significant architectural or product decision.",
+  "id": "dec-NNN",
+  "title": "",
+  "context": "",
+  "options_considered": [],
+  "chosen_option": "",
+  "rationale": "",
+  "consequences": "",
+  "status": "proposed",
+  "made_by": "",
+  "made_at": ""
+}

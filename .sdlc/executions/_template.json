@@ -1,0 +1,15 @@
+{
+  "_schema": "Execution v1.0.0",
+  "_description": "Audit log entry. Written by each phase agent to .sdlc/executions/{id}.json",
+  "id": "",
+  "work_item_id": "",
+  "phase": "",
+  "actor_id": "",
+  "started_at": "",
+  "ended_at": null,
+  "status": "running",
+  "consumed_artifact_version_ids": [],
+  "produced_artifact_version_ids": [],
+  "decision_ids": [],
+  "phase_packet_ref": ".sdlc/phases/{work-item-id}/{phase}.json"
+}
