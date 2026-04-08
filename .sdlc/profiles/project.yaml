@@ -1,0 +1,103 @@
+# Project Profile
+# Fill in values for your project. All fields are injected into agent prompts.
+
+stack:
+  language: ""                   # e.g. typescript, kotlin, python, swift
+  runtime: ""                    # e.g. node, jvm, cpython, ios
+  frameworks: []                 # e.g. [react, express] | [spring-boot] | [fastapi]
+  test_framework: ""             # e.g. jest, junit, pytest, xctest
+  e2e_framework: ""              # e.g. playwright, detox, appium, espresso
+
+commands:
+  build: ""                      # e.g. npm run build
+  unit_test: ""                  # e.g. npm test
+  e2e_test: ""                   # e.g. npm run test:e2e
+  lint: ""                       # e.g. npm run lint
+  typecheck: ""                  # e.g. npx tsc --noEmit
+
+repo_layout:
+  source: ""                     # e.g. src/
+  tests: ""                      # e.g. src/__tests__/
+  e2e: ""                        # e.g. e2e/
+  docs: ""                       # e.g. docs/
+
+observability:
+  platform: ""                   # e.g. datadog, cloudwatch, elk, sentry, mlflow, otel
+  log_sources: []                 # e.g. [application-logs, nginx-access, worker-logs]
+  trace_sources: []               # e.g. [datadog-apm, jaeger, xray]
+  metric_sources: []              # e.g. [prometheus, cloudwatch-metrics]
+  incident_channel: ""           # e.g. #incidents or pager/escalation queue
+  runbook_url: ""                # Optional link to the primary operational runbook
+
+conventions: []
+  # Add project-specific conventions agents must follow. Examples:
+  # - "Use functional components with hooks, not class components"
+  # - "All API responses follow { data, error, meta } envelope"
+  # - "Error handling: throw typed errors, catch at route handler"
+  # - "Database access only through repository pattern"
+
+canonical_examples: []
+  # Point to reference files agents should model new code after. Examples:
+  # - path: src/features/auth/AuthService.ts
+  #   description: "Reference implementation for a service class"
+  # - path: src/api/routes/users.ts
+  #   description: "Reference implementation for a route handler"
+
+work_type_overrides: {}
+  # Optional per-work-type overrides layered on top of `.sdlc/work-types/{id}.md`.
+  # Use this when your team handles the same kind of work differently from the framework default.
+  #
+  # Example:
+  # debugging:
+  #   additional_steps:
+  #     - "After root cause is confirmed, post a summary in #incidents"
+  #   step_overrides:
+  #     "Step 2: Isolate":
+  #       how:
+  #         - "Trace the request in Datadog APM using the correlation ID"
+  #       tools: [datadog-mcp]
+  #   replace_all_steps: false
+  #   custom_steps: []
+  #   required_tools: [datadog-mcp, pact-verifier]
+  #   model_overrides:
+  #     decide: { model: "claude-opus-4" }
+  #   additional_verification:
+  #     - "Regression test added for the failing path"
+  #
+  # Optional shared investigation surfaces for coworker-style debugging:
+  # observability:
+  #   platform: datadog
+  #   log_sources: [application-logs, worker-logs]
+  #   trace_sources: [datadog-apm]
+  #   incident_channel: "#incidents"
+
+artifact_policy:
+  baseline: {}
+    # Optional: declare artifact subtype expectations for this project.
+    # Resolution precedence:
+    # 1. active scope reality
+    # 2. artifact_policy.by_work_type
+    # 3. artifact_policy.baseline
+    # 4. project-type guide defaults
+    # 5. framework deliverables matrix
+    # Severity meanings:
+    # - required: missing artifact should block or gate progress for the active scope
+    # - warn: missing artifact should raise an artifact gap and a recommendation
+    # - optional: no automatic warning unless a workflow explicitly asks for it
+    #
+    # Example:
+    # context-view: required
+    # container-view: required
+    # interaction-view: warn
+    # contract-view: warn
+    # deployment-view: optional
+  by_work_type: {}
+    # Optional per-work-type overrides layered on top of baseline expectations.
+    # These entries take precedence over `artifact_policy.baseline` for the active work type.
+    # Example:
+    # debugging:
+    #   interaction-view: required
+    #   contract-view: warn
+    # code-review:
+    #   contract-view: required
+    #   deployment-view: warn
