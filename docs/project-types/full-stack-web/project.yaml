@@ -1,0 +1,98 @@
+stack:
+  language: typescript
+  runtime: node
+  frameworks: [nextjs, react, prisma, tailwindcss]
+  testing:
+    unit: vitest
+    e2e: playwright
+
+commands:
+  dev: yarn dev
+  build: yarn build
+  test: yarn test
+  test_e2e: yarn test:e2e
+  lint: yarn lint
+  types: yarn types
+  db_migrate: yarn db:migrate
+  db_generate: yarn db:generate
+
+repo_layout:
+  src/app/: Next.js app router pages, layouts, and server components
+  src/components/: Shared UI components (atomic design)
+  src/server/: Backend-only logic, services, and tRPC/REST routers
+  prisma/: Database schema and migrations
+  e2e/: Playwright test suites
+
+observability:
+  platform: sentry
+  log_sources: [browser-errors, server-logs]
+  trace_sources: [sentry-tracing]
+  metric_sources: [web-vitals, api-latency]
+  incident_channel: "#web-incidents"
+
+conventions:
+  - name: server_first
+    rule: Prefer Server Components for data fetching and layout structure.
+  - name: client_boundaries
+    rule: Mark client components with 'use client' only when interactivity (state/hooks) is required.
+  - name: action_pattern
+    rule: Use Next.js Server Actions for data mutations (POST, PUT, DELETE).
+  - name: validation
+    rule: Use Zod to validate all incoming data at the API and Server Action boundaries.
+  - name: db_access
+    rule: Keep database queries in 'src/server/db.ts' or specialized service files; never in UI files.
+  - name: api_types
+    rule: Auto-generate TypeScript types from Prisma schema for end-to-end type safety.
+  - name: auth_guard
+    rule: Check user session in the layout or page level using NextAuth.js or similar.
+  - name: design_tokens
+    rule: Use Tailwind CSS classes for all styling; avoid custom CSS unless necessary.
+  - name: testing_rtl
+    rule: Use React Testing Library for component unit tests.
+  - name: error_handling
+    rule: Implement global error boundaries and consistent try-catch-notify flows for actions.
+
+work_type_overrides:
+  debugging:
+    additional_steps:
+      - "Decide whether the symptom is browser-only, server-only, or a boundary bug before changing code"
+      - "Collect the user-visible failure, network request details, and matching server action or API evidence"
+      - "Let a human choose rollback, feature-flag, or hotfix actions when production behavior is involved"
+    required_tools:
+      - sentry
+      - browser-devtools
+      - playwright
+    additional_verification:
+      - "The same user journey is rechecked from UI through server boundary"
+      - "Feature-flag or rollback actions are confirmed by a human owner"
+
+artifact_policy:
+  baseline:
+    context-view: warn
+    container-view: required
+    interaction-view: required
+    contract-view: warn
+  by_work_type:
+    debugging:
+      interaction-view: required
+      contract-view: warn
+
+canonical_examples:
+  server_component:
+    path: src/app/users/page.tsx
+    description: A server component fetching data directly via Prisma.
+  client_component:
+    path: src/components/UserButton.tsx
+    description: A client component with interactive state for toggling a menu.
+  server_action:
+    path: src/app/actions/createUser.ts
+    description: An async function with 'use server' for database mutations.
+  api_route:
+    path: src/app/api/health/route.ts
+    description: A standard Next.js Route Handler for health checks.
+  prisma_model:
+    path: prisma/schema.prisma
+    description: A relational database model definition for a User entity.
+  e2e_test:
+    path: e2e/auth.spec.ts
+    description: A Playwright test covering the full login flow from UI to DB.
