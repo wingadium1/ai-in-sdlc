@@ -33,6 +33,8 @@ Current AI tools (Copilot, Claude Code) assist at the **file/function level** bu
 
 A layered system of **agent skills** that each target a specific developer intent and drive a **phase pipeline** through the SDLC, backed by a **persistent knowledge base** that maintains project context across sessions.
 
+> **Related note**: The idea of a Karpathy-style layered LLM wiki is captured separately in [`docs/llm-wiki-knowledge-layer-note.md`](docs/llm-wiki-knowledge-layer-note.md). It is intentionally positioned as an external knowledge-system direction, not part of the core `ai-in-sdlc` architecture in this repository.
+
 ### Developer Entry Points (Skills)
 
 | Skill | Developer Intent | Phases Triggered |
