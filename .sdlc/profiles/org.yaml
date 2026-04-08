@@ -1,0 +1,28 @@
+# Org Profile (optional)
+# Organization-wide defaults. Overridden by project-level profiles.
+# Useful for enforcing approval policies and model budgets across all projects.
+
+# --- Model budget defaults (project models.yaml takes precedence) ---
+models:
+  defaults:
+    high: "claude-opus-4"
+    mid:  "claude-sonnet-4"
+    low:  "claude-haiku-3"
+
+# --- Approval policies ---
+# Projects can tighten but not loosen these gates.
+gate_policy:
+  architecture_change: "human-required"
+  api_contract_change: "human-required"
+  security_sensitive:  "human-required"
+  pr_merge:            "human-required"
+
+# --- Org-wide conventions (appended to project conventions) ---
+conventions: []
+  # - "All code must pass security scan before merge"
+  # - "Unit test coverage must be >= 80% for new code"
+
+# --- Compliance / audit settings ---
+audit:
+  retain_executions_days: 90     # How long to keep execution logs
+  require_linked_requirement: true  # Produce phase must link to a requirement

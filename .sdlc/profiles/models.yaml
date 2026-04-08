@@ -1,0 +1,61 @@
+# Model Routing Configuration
+# Controls which AI model runs for each phase and skill.
+# Agents use tier aliases — change defaults here to update all phases at once.
+
+# --- Tier aliases ---
+# Change these to switch models project-wide (affects all phases using that tier)
+defaults:
+  high: "claude-opus-4"          # Architecture decisions, complex design, impact analysis
+  mid:  "claude-sonnet-4"        # Code generation, requirement structuring, test writing
+  low:  "claude-haiku-3"         # Mechanical tasks: checks, PR creation, context loading
+
+# Alternative provider defaults (uncomment to use GPT instead of Claude)
+# defaults:
+#   high: "gpt-5.4"
+#   mid:  "gpt-5.4"
+#   low:  "gpt-4o-mini"
+
+# --- Per-phase tier assignments ---
+# null model = use tier default from defaults above
+phases:
+  intake:    {tier: low,  model: null}
+  define:    {tier: mid,  model: null}
+  decide:    {tier: high, model: null}
+  produce:   {tier: mid,  model: null}
+  verify:    {tier: low,  model: null}
+  approve:   {tier: null, model: null}   # Human-only — no model
+  integrate: {tier: low,  model: null}
+
+# --- Per-skill phase overrides ---
+# Takes precedence over phase defaults above.
+# Format: skills.{skill-id}.{phase}: {model: "model-name"}
+skills:
+  start-feature:
+    decide:  {model: "claude-opus-4"}    # Features carry highest architecture risk
+  fix-bug:
+    decide:  {model: "claude-sonnet-4"}  # Root cause analysis is scope-limited
+  write-unit-tests:
+    produce: {model: "claude-sonnet-4"}
+  write-auto-tests:
+    decide:  {model: "claude-opus-4"}    # Test strategy + environment design
+    produce: {model: "claude-sonnet-4"}
+  update-requirements:
+    define:  {model: "claude-opus-4"}    # Requirement structuring must be precise
+
+# --- Per-work-type phase overrides ---
+# Applied when the WorkItem carries `work_type`.
+# Takes precedence over skill overrides above.
+work_types:
+  debugging:
+    decide: {model: "claude-opus-4"}     # Root-cause analysis often needs deeper reasoning
+  code-review:
+    decide: {model: "claude-opus-4"}     # High-signal review benefits from stronger risk analysis
+  requirement-analysis:
+    define: {model: "claude-opus-4"}     # Requirement shaping is high-stakes and ambiguity-sensitive
+
+# --- Fallback chain ---
+# If primary model is unavailable or rate-limited, tries next in list.
+fallback_chain:
+  high: ["claude-opus-4", "gpt-5.4",     "claude-sonnet-4"]
+  mid:  ["claude-sonnet-4", "gpt-5.4",   "claude-haiku-3"]
+  low:  ["claude-haiku-3",  "gpt-4o-mini", "claude-sonnet-4"]
