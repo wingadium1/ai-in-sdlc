@@ -1,0 +1,92 @@
+# project.yaml - Node.js Microservice Template
+# This file defines the stack, commands, and conventions for a TypeScript microservice.
+
+project:
+  name: node-microservice-template
+  type: microservice
+  language: typescript
+
+stack:
+  runtime: node
+  framework: fastify
+  orm: prisma
+  messaging: kafkajs
+  testing:
+    unit: vitest
+    integration: supertest
+    contract: pact
+
+commands:
+  build: yarn build
+  unit_test: yarn test:unit
+  integration_test: yarn test:contract
+  lint: yarn lint
+  typecheck: yarn tsc --noEmit
+  docker_build: docker build -t service-name .
+  migrate: yarn prisma migrate deploy
+
+repo_layout:
+  - src/               # Application source code
+  - src/__tests__/     # Unit, integration, and contract tests
+  - .sdlc/             # Framework metadata and artifacts
+  - prisma/            # Database schema and migrations
+  - scripts/           # Deployment and utility scripts
+
+conventions:
+  - use_correlation_id: "Pass x-correlation-id in all HTTP headers and event metadata"
+  - contract_first: "Update OpenAPI/AsyncAPI spec before starting implementation"
+  - structured_logging: "Use pino for JSON logging with service name and trace IDs"
+  - error_types: "Distinguish between BusinessError, ValidationError, and SystemError"
+  - config_management: "Load configuration from environment variables via fastify-env"
+  - health_check: "Implement /health and /ready routes for liveness and readiness"
+  - circuit_breaking: "Use opossum for all outgoing service-to-service calls"
+  - db_access: "One database per service; no direct cross-service queries"
+  - event_validation: "Validate all incoming and outgoing Kafka events against schema registry"
+  - dependency_injection: "Use Fastify plugins for cross-cutting concerns like DB and Kafka"
+
+work_type_overrides:
+  debugging:
+    additional_steps:
+      - "Start from the correlation ID and trace the request across affected services"
+      - "Reproduce with recorded consumer requests or contract fixtures before changing code"
+      - "Validate produced and consumed Kafka messages against the schema registry"
+    required_tools:
+      - datadog-apm
+      - pact
+      - schema-registry-cli
+    additional_verification:
+      - "Consumer-driven contract tests pass for all touched APIs or events"
+      - "Rollback or feature-flag plan is documented for cross-service fixes"
+  code-review:
+    additional_steps:
+      - "List affected services, data stores, and downstream consumers as part of blast-radius analysis"
+      - "Check backward compatibility for OpenAPI, AsyncAPI, and event-schema changes"
+    required_tools:
+      - openapi-diff
+      - pact
+    additional_verification:
+      - "Cross-service contract changes name the consuming service owners"
+
+artifact_policy:
+  baseline:
+    context-view: warn
+    container-view: required
+    contract-view: required
+    interaction-view: required
+    deployment-view: warn
+  by_work_type:
+    debugging:
+      interaction-view: required
+      contract-view: required
+      deployment-view: warn
+    code-review:
+      contract-view: required
+      interaction-view: warn
+      deployment-view: warn
+
+canonical_examples:
+  route_handler: "src/routes/v1/user/create.ts"
+  event_producer: "src/services/events/user-created.producer.ts"
+  event_consumer: "src/services/events/user-updated.consumer.ts"
+  contract_test: "src/__tests__/contract/user-provider.pact.ts"
+  service_client: "src/clients/inventory-service.client.ts"
