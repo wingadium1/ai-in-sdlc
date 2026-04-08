@@ -1,0 +1,44 @@
+# Embedded Project Template: STM32 with FreeRTOS
+# Built with CMake + ARM GCC
+
+stack:
+  language: "c"
+  toolchain: "arm-none-eabi-gcc"
+  frameworks:
+    - "freertos"
+    - "stm32-hal"
+    - "cmsis"
+  testing:
+    unit: "unity" # Unit tests run on host with mocked HAL
+    hil: "manual" # Hardware-in-the-loop tests are manual or custom
+
+commands:
+  build: "cmake --build build/"
+  test: "make test"
+  flash: "make flash"
+  static-analysis: "make static-analysis"
+
+repo_layout:
+  - "src/"         # Source files
+  - "include/"     # Header files
+  - "tests/"       # Host-based unit tests
+  - "drivers/"     # HAL layer and peripheral drivers
+  - "third_party/" # RTOS and external libraries
+
+conventions:
+  - "Use <stdint.h> types for all fixed-width integer declarations."
+  - "No dynamic memory allocation (malloc/new) in ISR or time-critical code."
+  - "Hardware-mapped variables must be declared volatile."
+  - "Register access must be abstracted through the HAL layer."
+  - "Every function returning an error must have its error codes defined."
+  - "ISRs must be short and never block."
+  - "RTOS tasks must have assigned stack sizes and priorities."
+  - "All shared data between tasks/ISRs must use thread-safe mechanisms."
+  - "Memory alignment must match MCU hardware requirements."
+  - "Code must be MISRA-compliant for safety-critical components."
+
+canonical_examples:
+  - "HAL module: drivers/uart_driver.c"
+  - "FreeRTOS task: src/app_task.c"
+  - "ISR handler: src/interrupts.c"
+  - "Host unit test: tests/test_logic.c"
