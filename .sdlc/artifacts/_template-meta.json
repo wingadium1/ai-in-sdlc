@@ -1,0 +1,21 @@
+{
+  "_schema": "ArtifactVersion v1.0.0",
+  "_description": "Copy to .sdlc/artifacts/{kind}/{id}/meta.json",
+  "id": "",
+  "artifact_id": "",
+  "version": "1.0.0",
+  "kind": "requirement",
+  "content_ref": "./content.md",
+  "provenance_mode": "ai",
+  "provider": "",
+  "source_uri": null,
+  "source_version": null,
+  "created_by_actor": "",
+  "created_in_execution": "",
+  "created_at": "",
+  "checksum": "",
+  "approval_state": "draft",
+  "authority_state": "derived",
+  "supersedes": null,
+  "derives_from": []
+}

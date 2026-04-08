@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "knowledge_adapter": "local-file",
+  "knowledge_adapter_config": {},
+  "active_providers": [],
+  "providers": {
+    "jira": {
+      "base_url": "",
+      "project_key": "",
+      "token_env": "JIRA_TOKEN"
+    },
+    "figma": {
+      "team_id": "",
+      "token_env": "FIGMA_TOKEN"
+    },
+    "linear": {
+      "team_id": "",
+      "token_env": "LINEAR_TOKEN"
+    }
+  },
+  "profiles": {
+    "project": ".sdlc/profiles/project.yaml",
+    "org": ".sdlc/profiles/org.yaml",
+    "models": ".sdlc/profiles/models.yaml"
+  },
+  "gate_policy": {
+    "architecture_change": "human-required",
+    "api_contract_change": "human-required",
+    "design_artifact": "human-required",
+    "pr_merge": "human-required",
+    "security_sensitive": "human-required",
+    "unit_test_addition": "auto-pass",
+    "documentation": "auto-pass",
+    "refactor_no_behavior_change": "auto-pass"
+  }
+}

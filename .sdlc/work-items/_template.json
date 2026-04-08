@@ -1,0 +1,14 @@
+{
+  "_schema": "WorkItem v1.1.0",
+  "_description": "Copy this file to .sdlc/work-items/{id}.json and fill in values",
+  "id": "wi-YYYYMMDD-NNN",
+  "kind": "feature",
+  "title": "",
+  "description": "",
+  "status": "open",
+  "skill_id": "start-feature",
+  "work_type": null,
+  "linked_artifact_ids": [],
+  "created_by": "actor-copilot-user",
+  "created_at": ""
+}
