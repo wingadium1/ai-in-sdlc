@@ -1,0 +1,13 @@
+# AI in SDLC — gitignore
+# Credentials and local overrides — never commit
+
+# Local credential overrides
+.sdlc/.env
+.sdlc/.secrets/
+
+# Local profile overrides (optional — developer-specific settings)
+# .sdlc/profiles/local.yaml
+
+# OS and editor artifacts
+.DS_Store
+Thumbs.db
