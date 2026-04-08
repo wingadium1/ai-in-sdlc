@@ -1,0 +1,67 @@
+# project.yaml
+# Template for a Node.js CLI (TypeScript, commander.js, published to npm)
+
+stack:
+  language: typescript
+  runtime: node
+  cli_framework: commander
+  styling: [chalk, ora]
+  testing: vitest
+  # No dedicated e2e framework - integration tests spawn the actual CLI binary process
+
+commands:
+  build: yarn build
+  test: yarn test
+  lint: yarn lint
+  types: yarn types
+  # Integration tests spawn the actual CLI binary
+  test_integration: yarn test:integration
+
+repo_layout:
+  source: src/
+  tests: src/__tests__/
+  # build output (gitignored)
+  output: dist/
+
+conventions:
+  - CLI_01: Always use kebab-case for CLI flags (e.g., --output-format).
+  - CLI_02: Every command and flag must have descriptive --help text.
+  - CLI_03: Exit with non-zero status codes on error.
+  - CLI_04: Print error messages and warnings to stderr.
+  - CLI_05: No side effects (e.g., writing to filesystem) when library is imported.
+  - CLI_06: Use deprecation warnings for at least one minor version before removal.
+  - CLI_07: Never introduce breaking changes in a patch release.
+  - CLI_08: Configuration changes are breaking changes (Semver Major).
+  - CLI_09: Support .rc and .json config formats for backward compatibility.
+  - CLI_10: Document all exit codes in the README or man page.
+
+canonical_examples:
+  # Command file
+  command: |
+    import { Command } from 'commander';
+    const program = new Command();
+    program.command('list')
+      .description('List all available items')
+      .action(() => { console.log('Items listed.'); });
+  # Exported library function
+  exported_function: |
+    /**
+     * Lists all available items.
+     */
+    export function listItems(): string[] {
+      return ['item1', 'item2'];
+    }
+  # Integration test spawning CLI
+  integration_test: |
+    import { execSync } from 'child_process';
+    test('cli outputs help', () => {
+      const output = execSync('node ./dist/index.js --help').toString();
+      expect(output).toContain('Usage:');
+    });
+  # CHANGELOG entry format
+  changelog_format: |
+    ## [Unreleased]
+    ### Added
+    - Support for --json output in list command.
+    ### Fixed
+    - Typo in help text for deploy command.
