@@ -1,0 +1,81 @@
+# Project Configuration for TypeScript/Node + Express Backend API
+# This file adapts the AI-assisted SDLC to the project's specific stack.
+
+stack:
+  language: typescript
+  runtime: node
+  framework: express
+  orm: prisma
+  unit_test: vitest
+  integration_test: supertest
+  validation: zod
+  e2e_framework: none # Pure API projects skip E2E browser tests
+
+commands:
+  build: npm run build
+  unit_test: npx vitest run src/**/__tests__/unit/
+  integration_test: npx vitest run src/**/__tests__/integration/
+  lint: npm run lint
+  typecheck: npx tsc --noEmit
+  db_migrate: npx prisma migrate deploy
+  db_migrate_dry_run: npx prisma migrate dev --create-only --skip-generate
+
+repo_layout:
+  source: src/
+  tests: src/__tests__/
+  routes: src/routes/
+  services: src/services/
+  repositories: src/repositories/
+  migrations: prisma/migrations/
+  schemas: src/schemas/ # For Zod/validation schemas
+
+observability:
+  platform: otel
+  log_sources: [api-logs, access-logs]
+  trace_sources: [otel-traces]
+  metric_sources: [service-metrics]
+  incident_channel: "#backend-incidents"
+
+conventions:
+  - use_async_await: true
+  - error_envelope: '{ "error": { "code": string, "message": string } }'
+  - validation_at_boundary: true # All route inputs must use Zod
+  - route_logic_restriction: "orchestration only"
+  - service_logic_restriction: "business logic only"
+  - repository_logic_restriction: "data access only"
+  - mock_repositories_in_unit_tests: true
+  - use_test_database_for_integration: true
+  - reversible_migrations: true
+  - typed_errors: true
+
+work_type_overrides:
+  debugging:
+    additional_steps:
+      - "Start from the failing request, request ID, or structured error before editing code"
+      - "Check route, service, repository, schema, and migration boundaries in that order"
+      - "Let a human choose any production mitigation or database repair step"
+    required_tools:
+      - otel-trace
+      - structured-logs
+      - prisma
+    additional_verification:
+      - "The failing route or integration path is rechecked after the fix"
+      - "Any database-impacting mitigation is confirmed by a human operator"
+
+artifact_policy:
+  baseline:
+    context-view: warn
+    container-view: warn
+    contract-view: required
+    interaction-view: warn
+  by_work_type:
+    debugging:
+      interaction-view: required
+      contract-view: required
+
+canonical_examples:
+  route: src/routes/user.route.ts
+  service: src/services/user.service.ts
+  repository: src/repositories/user.repository.ts
+  integration_test: src/__tests__/integration/user.test.ts
+  migration: prisma/migrations/20240101_init.sql
