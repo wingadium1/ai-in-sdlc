@@ -1,0 +1,110 @@
+# project.yaml
+# Template for a Python + Apache Airflow + dbt + MLflow project.
+
+# Technical Stack
+stack:
+  language: python
+  runtime: cpython
+  frameworks:
+    - airflow
+    - dbt
+    - mlflow
+    - pandas
+    - scikit-learn
+    - pytorch
+  testing:
+    unit: pytest
+    data_quality: great_expectations
+
+# Common Development Commands
+commands:
+  test: "make test"
+  lint: "make lint" # Runs ruff or flake8
+  typecheck: "make typecheck" # Runs mypy
+  dbt_test: "make dbt-test"
+  validate_schema: "make validate-schema"
+  airflow_test: "airflow dags test"
+
+# Repository Layout
+repo_layout:
+  - "src/pipelines/": "Airflow DAGs and pipeline orchestration"
+  - "src/features/": "Feature engineering and transformation logic"
+  - "src/models/": "Model training and evaluation scripts"
+  - "src/transforms/": "Reusable data transformation utilities"
+  - "tests/": "Unit and integration tests with synthetic fixtures"
+  - "notebooks/": "Experimentation only (not for production logic)"
+  - "dbt/": "dbt models, seeds, and tests"
+
+# Data/ML SDLC Conventions
+conventions:
+  - "Idempotent Transforms: All pipeline steps must be idempotent."
+  - "Schema Validation: Validate data schemas at pipeline entry points."
+  - "No Production Notebooks: Port logic to modular Python files."
+  - "Synthetic Fixture Data: Use generated data, never PII, for tests."
+  - "Log Data Lineage: Track data source and destination for all transforms."
+  - "Version All Models: All model artifacts must be registered and tagged."
+  - "Stateless Features: Use pure functions for feature engineering."
+  - "Explicit Side Effects: Log all database or API writes clearly."
+  - "Drift Detection: Monitor value distributions for data drift."
+  - "Hard Schema Errors: Treat schema violations as critical failures."
+
+work_type_overrides:
+  debugging:
+    additional_steps:
+      - "Reproduce the failing pipeline or model path on a fixed sample dataset before editing code"
+      - "Compare data quality results and model metrics against the last approved baseline"
+      - "Attach the failing MLflow run, dataset version, or feature snapshot to the bug analysis"
+    required_tools:
+      - mlflow
+      - great_expectations
+      - airflow-monitoring
+    additional_verification:
+      - "Data quality checks pass on the fixed regression dataset"
+      - "Metric deltas are explained if they change after the fix"
+  requirement-analysis:
+    additional_steps:
+      - "Define input schema, output schema, metric thresholds, and freshness requirements explicitly"
+      - "State whether backfill, retraining, or model registry updates are required"
+    required_tools:
+      - mlflow
+      - dbt
+      - great_expectations
+    additional_verification:
+      - "Acceptance criteria include both functional behavior and metric thresholds"
+  code-review:
+    additional_steps:
+      - "Check experiment-to-production boundaries so notebooks are not treated as deployable artifacts"
+      - "Review lineage, reproducibility, and model versioning evidence alongside code changes"
+    required_tools:
+      - mlflow
+      - great_expectations
+    additional_verification:
+      - "Changed pipelines or models identify the baseline dataset and approved comparison metric"
+
+artifact_policy:
+  baseline:
+    context-view: warn
+    container-view: warn
+    contract-view: required
+    interaction-view: required
+    deployment-view: required
+    state-view: optional
+  by_work_type:
+    debugging:
+      interaction-view: required
+      contract-view: required
+      deployment-view: warn
+    requirement-analysis:
+      contract-view: required
+      interaction-view: warn
+    code-review:
+      contract-view: required
+      deployment-view: warn
+
+# Canonical Examples
+canonical_examples:
+  - transformer: "src/features/user_features.py (Modular Python class)"
+  - DAG: "src/pipelines/training_pipeline.py (Airflow DAG script)"
+  - dbt_model: "dbt/models/staging/stg_users.sql (dbt SQL model)"
+  - pytest_fixture: "tests/fixtures/sample_events.json (Synthetic test data)"
+  - evaluation_script: "src/models/evaluate_v1.py (Model metric report script)"
