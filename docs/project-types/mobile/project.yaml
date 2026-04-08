@@ -1,0 +1,53 @@
+# project.yaml — Mobile (React Native + Expo)
+
+# Technology stack configuration
+stack:
+  language: typescript
+  runtime: node
+  frameworks:
+    - react-native
+    - expo
+    - react-navigation
+  state_management: zustand
+  testing:
+    unit: jest
+    e2e: detox
+
+# Common lifecycle commands
+commands:
+  start: "yarn start"
+  build_ios: "yarn build:ios"
+  build_android: "yarn build:android"
+  test: "yarn test"
+  test_e2e: "yarn test:e2e"
+  lint: "yarn lint"
+  type_check: "yarn types"
+
+# Repository organization
+repo_layout:
+  src: "Source code directory"
+  src_tests: "src/__tests__/"
+  e2e: "End-to-end test directory"
+  ios: "Native iOS project files"
+  android: "Native Android project files"
+
+# React Native specific coding conventions
+conventions:
+  - "Use custom hooks (e.g., useProfileViewModel) to separate logic from View components."
+  - "All presentational components must be 'dumb' and receive data via props."
+  - "Prefer Zustand for global state management; avoid deep prop drilling."
+  - "Centralize all navigation logic in a dedicated navigator config file."
+  - "Handle platform-specific UI variations using Platform.select()."
+  - "Never perform side effects (API calls, storage writes) directly in the render cycle."
+  - "Implement loading, error, and empty states for every data-dependent screen."
+  - "Request permissions only when needed; never on app launch unless mandatory."
+  - "Use FlatList for rendering long lists to ensure optimal scroll performance."
+  - "Define all design tokens (colors, spacing, typography) in a central theme file."
+
+# Canonical implementation patterns
+canonical_examples:
+  screen: "src/screens/HomeScreen.tsx — Presentational UI component"
+  view_model: "src/hooks/useHomeViewModel.ts — Screen-specific logic and state"
+  repository: "src/repositories/UserRepository.ts — Data fetching with AsyncStorage caching"
+  navigation: "src/navigation/AppNavigator.tsx — Navigation stack and deep link config"
+  e2e_test: "e2e/login.spec.js — Detox test for the authentication flow"
