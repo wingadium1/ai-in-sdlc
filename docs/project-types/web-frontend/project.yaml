@@ -1,0 +1,89 @@
+# project.yaml — ai-in-sdlc configuration for Web Frontend
+# Place this in .sdlc/profiles/project.yaml
+
+project:
+  name: "My Web App"
+  type: "web-frontend"
+  version: "1.0.0"
+
+stack:
+  language: "typescript"
+  runtime: "node"
+  framework: "react" # Alternatives: "vue", "angular", "svelte"
+  bundler: "vite" # Alternatives: "webpack", "nextjs", "nuxt"
+  test_unit: ["vitest", "react-testing-library"] # Alternatives: ["jest"]
+  test_e2e: "playwright" # Alternatives: "cypress"
+  styling: "tailwind" # Alternatives: "css-modules", "styled-components"
+  state_management: "zustand" # Alternatives: "redux-toolkit", "react-context"
+
+commands:
+  build: "yarn build"
+  test: "yarn test"
+  test_e2e: "yarn test:e2e"
+  lint: "yarn lint"
+  types: "yarn types"
+  storybook: "yarn storybook"
+  dev: "yarn dev"
+
+repo_layout:
+  src: "src/"
+  tests: "src/__tests__/" # Or "co-located" (files with .test.tsx)
+  e2e: "e2e/"
+  docs: "docs/"
+  storybook: ".storybook/"
+  public: "public/"
+
+observability:
+  platform: sentry
+  log_sources: [browser-console, client-errors]
+  trace_sources: [frontend-performance]
+  metric_sources: [web-vitals]
+  incident_channel: "#frontend-incidents"
+
+conventions:
+  - "Use functional components with hooks exclusively."
+  - "All components must have a TypeScript props interface defined above the component."
+  - "Prefer named exports over default exports."
+  - "Maintain a mobile-first responsive design approach."
+  - "Use semantic HTML elements to ensure baseline accessibility."
+  - "All interactive elements must be keyboard-accessible and have ARIA labels where needed."
+  - "Co-locate test and story files with the component they relate to."
+  - "Follow an atomic design or feature-based structure as defined in repo_layout."
+  - "Use co-located CSS modules or utility classes (Tailwind); never use inline styles."
+  - "Use design tokens for colors, spacing, and typography."
+
+work_type_overrides:
+  debugging:
+    additional_steps:
+      - "Capture the visible symptom first: screen state, browser error, broken interaction, or accessibility failure"
+      - "Check browser console, network calls, and state transitions before changing components"
+      - "Let a human confirm visual or device-specific recovery when the bug depends on real-user conditions"
+    required_tools:
+      - sentry
+      - browser-devtools
+      - playwright
+    additional_verification:
+      - "The same interaction path is replayed after the fix"
+      - "Accessibility or responsive regressions are rechecked on the affected surface"
+
+artifact_policy:
+  baseline:
+    context-view: warn
+    container-view: warn
+    interaction-view: required
+    state-view: warn
+  by_work_type:
+    debugging:
+      interaction-view: required
+      state-view: warn
+
+canonical_examples:
+  atomic_component: "src/components/ui/Button/Button.tsx"
+  feature_component: "src/features/auth/LoginForm.tsx"
+  custom_hook: "src/hooks/useFetchData.ts"
+  context_provider: "src/context/ThemeContext.tsx"
+  api_service: "src/api/authService.ts"
+
+# Documentation:
+# For Vue: framework: vue, stack: [vue, vite, vue-test-utils]
+# For Angular: framework: angular, stack: [angular, webpack, jasmine, karma]
