@@ -1,0 +1,69 @@
+# Project adaptation template for Infrastructure / IaC (Terraform)
+stack:
+  language: hcl
+  tool: terraform
+  providers: [aws-provider, null-provider]
+  quality: [tflint, checkov]
+  cost: infracost
+
+commands:
+  validate: terraform validate
+  plan: terraform plan -out=tfplan
+  apply: terraform apply tfplan
+  lint: tflint
+  security: checkov -d .
+  cost_estimate: infracost breakdown --path .
+
+repo_layout:
+  modules: "modules/ — Reusable components"
+  environments:
+    dev: "environments/dev/ — Development environment"
+    staging: "environments/staging/ — Staging environment"
+    prod: "environments/prod/ — Production environment"
+  ci_cd: ".github/workflows/ — Infrastructure pipelines"
+
+conventions:
+  - "Prefer reusable modules over inline resource blocks"
+  - "Parameterize all environment-specific values in variables.tf"
+  - "Document all module inputs and outputs with descriptions"
+  - "Never hardcode account IDs, IP addresses, or region codes"
+  - "Configure a remote backend with state locking (S3/DynamoDB)"
+  - "Tag every resource with: Environment, Team, Service, ManagedBy"
+  - "Ensure all changes are idempotent and repeatable"
+  - "Flag resource replacements (destroy/recreate) for extra review"
+  - "Only perform production applies via the CI/CD pipeline"
+  - "Store plan outputs and decisions in the .sdlc/ directory"
+
+artifact_policy:
+  baseline:
+    context-view: warn
+    deployment-view: required
+    migration-view: required
+    runbook-view: warn
+    contract-view: warn
+  by_work_type:
+    debugging:
+      deployment-view: required
+      runbook-view: warn
+    code-review:
+      deployment-view: required
+      migration-view: warn
+    requirement-analysis:
+      migration-view: warn
+
+canonical_examples:
+  terraform_module:
+    - "variables.tf: Input definitions"
+    - "main.tf: Resource definitions"
+    - "outputs.tf: Value exports"
+    - "README.md: Module usage documentation"
+  environment_root:
+    - "backend.tf: Remote state configuration"
+    - "providers.tf: Provider definitions"
+    - "main.tf: Module instantiations"
+  ansible_role:
+    - "tasks/main.yml: Task list"
+    - "defaults/main.yml: Default variables"
+  helm_values:
+    - "values.yaml: Application configurations"
+    - "values-prod.yaml: Production overrides"
