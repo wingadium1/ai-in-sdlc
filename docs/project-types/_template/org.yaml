@@ -1,0 +1,27 @@
+# Org Profile Template
+# Copy to .sdlc/profiles/org.yaml and tune to your team standards.
+
+models:
+  defaults:
+    high: "claude-opus-4-5"
+    mid:  "claude-sonnet-4-5"
+    low:  "claude-3.5-haiku"
+
+gate_policy:
+  architecture_change: "human-required"
+  api_contract_change: "human-required"
+  security_sensitive:  "human-required"
+  pr_merge:            "human-required"
+
+conventions: []
+  # Add org-wide conventions appended to every project's conventions.
+  # Use for security rules, compliance, or coding standards that apply everywhere.
+  # Example:
+  # - "All external inputs must be validated before use"
+  # - "No secrets in code — use environment variables only"
+
+audit:
+  retain_executions_days: 90
+  require_linked_requirement: true
+  require_coverage_threshold: true
+  coverage_threshold: 80            # Adjust to your team standard
