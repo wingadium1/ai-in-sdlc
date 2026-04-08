@@ -1,0 +1,76 @@
+# Project Profile Template
+# Copy to .sdlc/profiles/project.yaml and fill in FILL IN: lines.
+
+stack:
+  language: ""                   # FILL IN: e.g. typescript, python, kotlin, swift
+  runtime: ""                    # FILL IN: e.g. node, jvm, cpython, ios
+  frameworks: []                 # FILL IN: e.g. [react, express]
+  test_framework: ""             # FILL IN: e.g. vitest, jest, pytest, junit
+  e2e_framework: ""              # FILL IN: e.g. cypress, playwright, detox, espresso
+
+commands:
+  build: ""                      # FILL IN: e.g. yarn build / ./gradlew build
+  unit_test: ""                  # FILL IN: e.g. yarn test:unit / pytest
+  e2e_test: ""                   # FILL IN: e.g. yarn cypress:run
+  lint: ""                       # FILL IN: e.g. yarn lint / flake8 .
+  typecheck: ""                  # FILL IN: e.g. yarn types / mypy src/
+
+repo_layout:
+  source: ""                     # FILL IN: e.g. src/
+  tests: ""                      # FILL IN: e.g. src/__tests__/ or tests/
+  e2e: ""                        # FILL IN: e.g. e2e/ or cypress/
+  docs: ""                       # FILL IN: e.g. docs/
+
+observability:
+  platform: ""                   # FILL IN: e.g. datadog, cloudwatch, elk, sentry, mlflow, otel
+  log_sources: []                 # FILL IN: key log streams or indexes for debugging
+  trace_sources: []               # FILL IN: APM/tracing systems if used
+  metric_sources: []              # FILL IN: metrics backends or dashboards
+  incident_channel: ""           # FILL IN: channel / queue where human coordination happens
+  runbook_url: ""                # FILL IN: operator runbook link if one exists
+
+conventions: []
+  # FILL IN: Add your team conventions here.
+  # These are injected into every agent prompt — be specific and actionable.
+  # Examples:
+  # - "All async functions must have explicit return type annotations"
+  # - "Never use default exports — always named exports"
+  # - "Error handling: throw typed errors, catch only at boundary layers"
+
+work_type_overrides: {}
+  # Optional: customize how agents handle a class of work for this project.
+  # Example:
+  # debugging:
+  #   additional_steps:
+  #     - "Attach the strongest available evidence before proposing a fix"
+  #     - "Let a human choose risky runtime actions or mitigations"
+  #   required_tools:
+  #     - "datadog"
+  #     - "sentry"
+
+artifact_policy:
+  baseline: {}
+    # Optional: declare expected artifact subtypes for this project.
+    # Allowed severities:
+    # - required
+    # - warn
+    # - optional
+    # Example:
+    # context-view: required
+    # container-view: required
+    # interaction-view: warn
+  by_work_type: {}
+    # Optional per-work-type overrides.
+    # Example:
+    # debugging:
+    #   interaction-view: required
+    # code-review:
+    #   contract-view: required
+
+canonical_examples: []
+  # FILL IN: Point to 2-4 real files in your project that agents should model new code after.
+  # Examples:
+  # - path: src/services/UserService.ts
+  #   description: "Reference service class — match this structure for new services"
+  # - path: src/api/routes/users.ts
+  #   description: "Reference route handler"
