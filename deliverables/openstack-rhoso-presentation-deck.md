@@ -106,6 +106,8 @@ The methodology enabled:
 
 ## Visual Diagram
 
+<!-- TODO: Capture screenshot of GSD wave execution flow diagram -->
+
 ```mermaid
 graph TD
     Start["Start PoC"]
@@ -167,6 +169,9 @@ graph TD
 
     T11 --> Final
 ```
+
+<!-- TODO: Capture screenshot of terminal showing parallel agent execution -->
+<!-- TODO: Capture screenshot of dependency matrix in action -->
 
 ---
 
@@ -415,6 +420,8 @@ PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest on NFS
 
 ## Test Results Summary
 
+<!-- TODO: Capture screenshot of VALIDATION RESULTS summary table -->
+
 | Test ID | Objective | Result | Status |
 |---------|-----------|--------|--------|
 | V1 | HA Failover | 0 failures, 1.69ms avg latency | PASS |
@@ -429,6 +436,8 @@ PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest on NFS
 | V28 | Alertmanager Alerting | 2 alerts ingested, <5s latency | PASS |
 
 ## Overall: 34/36 tests passed (94.4%)
+
+<!-- TODO: Capture screenshot of evidence file output showing 15 evidence files -->
 
 ---
 
@@ -532,15 +541,15 @@ PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest on NFS
 
 # Mapping Our Workflow to the CASAN Developmental Path
 
-## The CASAN Framework: Five Stages
+## The CASAN Framework: Five Stages in Practice
 
-| Stage | Name | Description |
-|-------|------|-------------|
-| 1 | Curious | Individual exploration, no governance |
-| 2 | Augmented | Licensed tools, individual productivity |
-| 3 | Standard | Structured, governed, repeatable processes |
-| 4 | Automated | AI agents operate with minimal human intervention |
-| 5 | Native | AI becomes core operating system |
+| Stage | Name | What It Looks Like in Practice |
+|-------|------|-------------------------------|
+| **1** | **Curious** | Individual developers experiment with AI tools ad-hoc. No governance, no shared practices. "I used Copilot to write this function." |
+| **2** | **Augmented** | Organization licenses AI tools. Individual productivity gains, but no coordination. "Our team uses Copilot for code completion." |
+| **3** | **Standard** | Structured, governed, repeatable processes. AI work follows defined workflows with handoffs and evidence. "We use GSD/OMO for all feature development with formal handoffs." |
+| **4** | **Automated** | AI agents operate with minimal human intervention. Humans define scope and review outputs, but execution is autonomous. "Agents execute validation cycles and produce evidence without manual intervention." |
+| **5** | **Native** | AI becomes the core operating system. Work is inconceivable without AI orchestration. Human role shifts to strategy and exception handling. |
 
 ## CASAN as a Developmental Path, Not a Ruler
 
@@ -563,6 +572,42 @@ The CASAN framework describes a **developmental path** — a journey from basic 
 ## Key Discovery
 
 **The team's workflow naturally aligned with the CASAN path** — GSD/OMO produced outcomes characteristic of the Standard stage (and emergent Automated-phase traits) without consciously following a formal maturity model. CASAN serves as the **structuring lens** of this entire case study, helping us recognize and articulate the maturity we achieved.
+
+---
+
+# GSD/OMO Capabilities Mapped to CASAN Harness Engineering
+
+## The Seven Harness Components
+
+The CASAN Harness Engineering framework defines seven core components that enable controlled AI capability. Our PoC achieved **Standard-phase** across 6/7 components, with **Augmented-phase** in AgentOps.
+
+| Harness Component | GSD/OMO Implementation | CASAN Stage Achieved | Evidence |
+|-------------------|------------------------|---------------------|----------|
+| **Context Harness** | Notepads (`.sisyphus/notepads/`) + handoff packets + phase packets | **Standard** | `.sisyphus/notepads/learnings.md`, `.sisyphus/handoffs/`, `.sdlc/phases/` |
+| **Tool Harness** | File I/O, git operations, subagent dispatch via OMO | **Standard** | 15 evidence files, structured commits, parallel agent execution |
+| **Validation Harness** | QA scenarios, evidence verification gates, diagnostic reasoning | **Standard–Automated** | 14 retest cycles, 15 evidence files, agent-executed verification |
+| **Security Harness** | Permission boundaries, no credentials in scope, env var isolation | **Standard** | `.sdlc/.env` (gitignored), credential-free phase packets |
+| **Governance Harness** | Decision log (D01-D10), handoff register (H-01 to H-04), audit trail | **Standard** | `.sdlc/decisions/`, `.sisyphus/handoffs/`, phase packets |
+| **AgentOps Harness** | Time tracking, evidence collection, model routing metrics | **Augmented** | Execution log exists but lacks real-time dashboards, cost tracking is manual |
+| **Orchestration Harness** | GSD waves, dependency matrix, parallel dispatch | **Standard** | `.sisyphus/plans/openstack-dbaas-casestudy.md`, wave-based execution |
+
+## Harness Maturity Summary
+
+**Overall Assessment**: **Standard-phase** (Stage 3) with emergent **Automated-phase** (Stage 4) characteristics in Validation and Orchestration.
+
+**What Standard-Phase Means**:
+- ✅ Structured, governed, repeatable processes
+- ✅ Formal handoffs and accountability transfer
+- ✅ Evidence-based verification
+- ✅ Audit trail for compliance
+
+**What Automated-Phase Would Require**:
+- ⚠️ Real-time AgentOps dashboards (cost, quality, performance metrics)
+- ⚠️ Automated model routing based on task complexity analysis
+- ⚠️ Self-healing workflows that retry failed tasks with adjusted parameters
+- ⚠️ Predictive quality scoring before human review
+
+<!-- TODO: Capture screenshot of harness engineering assessment matrix -->
 
 ---
 
@@ -652,6 +697,8 @@ The CASAN framework describes a **developmental path** — a journey from basic 
 3. **Create reusable agent templates catalog** for faster task assignment
 4. **Build memory layer** for cross-session context persistence
 5. **Develop automated compliance reporting** for governance enforcement
+
+<!-- TODO: Capture screenshot of git commit log showing structured commits -->
 
 ---
 
