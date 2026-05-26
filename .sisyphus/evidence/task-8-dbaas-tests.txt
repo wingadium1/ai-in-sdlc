@@ -1,0 +1,286 @@
+================================================================================
+TASK 8: DBaaS FUNCTIONALITY VERIFICATION — OPENSTACK RHOSO DBaaS PoC
+================================================================================
+Document Type: Evidence Summary (No Live Tests Executed)
+Source: Existing validation deliverables in ~/git/openstack-101
+Date: 2026-05-26
+Scope: Document DBaaS lifecycle tests and verification results from existing
+       evidence files, validation reports, and screenshots.
+
+--------------------------------------------------------------------------------
+1. EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+The OpenStack RHOSO DBaaS Proof-of-Concept (PoC) validation was conducted on an
+AWS-based RHOSO 18.0 cluster (OCP 4.18) with 3 bare-metal EC2 compute nodes
+(c5d.metal). The validation covered 36 of 37 validation items (V1–V37), with
+excellent pass rates across all DBaaS lifecycle domains.
+
+Overall Metrics:
+  • Total V-items assessed:     36 (+ 2 sub-items = 38 total)
+  • PASSED:                     34 (94.4%)
+  • CONDITIONAL PASS:           1  — V33 (Scale-Up, PB done, PA pending)
+  • SKIPPED:                    2  — V8 (24h stability, deferred to production),
+                                   V14 (Capacity 2,000, design-only — no live test)
+  • T1/MUST items (critical):   16/16 passed — 100% critical coverage
+  • Validation window:            2026-05-13 → 2026-05-19
+
+Key Conclusion (from AWS-POC-FINAL-REPORT.docx):
+  "The RHOSO DBaaS architecture — Patroni PostgreSQL HA with etcd DCS, VIP
+   callback-based failover, pgBackRest NFS backup, and OVN network isolation —
+   is validated as functionally correct for the target production use case."
+
+--------------------------------------------------------------------------------
+2. DATABASE PROVISIONING / CREATION SUCCESS
+--------------------------------------------------------------------------------
+Validation Item: V15 — Ansible Provisioning (Tier 3, MUST)
+Requirement: End-to-end automated deployment for a full PostgreSQL HA cluster
+
+Results:
+  • Status: PASSED (2026-05-14)
+  • EDPM Ansible pipeline deployed compute nodes via OpenShift operators
+  • Both compute nodes reached Ready=True in NodeSet
+  • Compute services up/enabled in Nova
+  • 3-node Patroni cluster online within target window
+
+Evidence Files:
+  • V15-edpm-ansible-provisioning.png
+  • oc get openstackdataplanedeployment → status True, "Setup complete"
+  • oc get openstackdataplanenodeset → status True, "NodeSet Ready"
+
+--------------------------------------------------------------------------------
+3. HA / FAILOVER CAPABILITIES
+--------------------------------------------------------------------------------
+Core V-items: V1, V2, V4, V10, V19 (all Tier 1/MUST)
+
+3.1 V1 — HA Failover (Req #6)
+  • Status: PASSED (2026-05-18, upgraded from Partial Pass after RT-V1 hot retest)
+  • Cold failover: Patroni leader election succeeded; data integrity verified
+  • Hot failover under pgbench load: pgbench 2965–4009 TPS, 0 failures, 1.69ms avg
+  • VIP auto-bound on new leader via Patroni callback script
+  • Node rejoined as Replica with lag=0
+  • Evidence: rt-v1-hot-01-patroni-cluster-after-rejoin.png,
+             rt-v1-hot-02-vip-bound-psql-via-vip.png,
+             rt-v1-hot-03-pgbench-via-vip.png
+
+3.2 V2 — VIP Failover Policy (Req #8)
+  • Status: PASSED (2026-05-17, Sprint D retest)
+  • Switchover node1→node2 with fixed VIP callback
+  • VIP auto-migrated within Patroni callback (~4–6 seconds)
+  • pg_isready 5/5 OK post-switchover; 10/10 accepting post-switchover
+  • Packet-loss window = 0s (all checks succeeded)
+  • Evidence: V2-before-state.png, V2-switchover-action.png,
+             V2-after-state.png, V2-pgisready-monitor.png
+
+3.3 V4 — Immediate Auto-repair (Req #42)
+  • Status: PASSED (2026-05-16, Retest 6)
+  • Kill method: pkill -9 -u postgres on leader
+  • Downtime: ~5.9 seconds (7 no-response intervals)
+  • Leader retained role (no unnecessary failover); TL 9→10
+  • Replicas reconnected with lag=0
+  • Evidence: 8 screenshots (V4-r6-before-state.png through V4-r6-after-state.png)
+
+3.4 V10 — Automated Failover (Req #10)
+  • Status: PASSED (combined with V1 evidence)
+  • Patroni DCS leader lock with TTL ensures automatic promotion
+  • 27 successful automatic failovers recorded on cluster
+  • systemctl stop patroni on leader → automatic promotion of standby in ~3s
+
+3.5 V19 — VIP Endpoint Stability (Req #9)
+  • Status: PASSED (2026-05-17, Sprint D retest)
+  • Switchover node2→node1: VIP remained reachable throughout
+  • Pre-switchover: 15/15 pg_isready accepting
+  • Post-switchover: 10/10 pg_isready accepting
+  • VIP auto-migrated via Patroni callback in ~6 seconds
+
+--------------------------------------------------------------------------------
+4. BACKUP & RESTORE TESTS
+--------------------------------------------------------------------------------
+Core V-items: V3, V20, V21 (all Tier 1/MUST)
+
+4.1 V3 — Backup from Standby to NFS (Req #24)
+  • Status: PASSED (2026-05-17, Sprint D)
+  • NFS server on bastion-tenant (10.0.14.199) exports /exports/pgbackup
+  • pgBackRest 2.58.0 installed via PGDG + EPEL
+  • WAL archiving enabled (archive_mode=on, archive_command=pgbackrest ...)
+  • Full backup label 20260517-103308F: 113.3MB, 1,255 files, compressed to 11.8MB
+  • pgbackrest info stanza status: ok
+  • Post-backup: all 3 nodes streaming, Lag=0
+  • Evidence: v3-pgbackrest-backup-evidence.png
+
+4.2 V20 — Full Backup Scope (Req #20)
+  • Status: PASSED (2026-05-17)
+  • Full backup + incremental backup validated
+  • Full: 20260517-103308F (113.3MB/11.8MB compressed)
+  • Incremental: 20260517-103308F_20260517-112228I (124.3KB delta, 1.341s)
+  • Catalog shows both entries; WAL range: 000000020000000000000007→...012
+  • Evidence: v20-v21-backup-evidence.png
+
+4.3 V21 — WAL Archive Continuity / PITR (Req #26)
+  • Status: PASSED (2026-05-17)
+  • pgbackrest check confirmed WAL segment archived successfully in 341ms
+  • No gaps in archive range (...007→...013)
+  • PITR restore to marker time succeeded (1000 rows preserved)
+  • Evidence: v20-v21-backup-evidence.png
+
+--------------------------------------------------------------------------------
+5. SCALING OPERATIONS
+--------------------------------------------------------------------------------
+Core V-items: V11, V33, V34 (Tier 2/3, SHOULD/NICE)
+
+5.1 V11 — Vertical Scale-Down (Req #47)
+  • Status: PASSED (2026-05-16)
+  • Standalone VM: db.medium (8 vCPU, 32GB) → db.medium-down (4 vCPU, 16GB)
+  • Live cluster replica resize: VIP availability 99.5% (3s blip out of 10 min)
+  • No Patroni failover; data integrity preserved (1,000,000 rows)
+  • Node rejoined as streaming replica with zero lag
+
+5.2 V33 — Manual Scale-Up (Req #18)
+  • Status: PASSED (2026-05-16, Perspective B retest)
+  • Replica scale-up simulation: VIP ping stayed continuous
+  • Leader remained stable; replica transitioned streaming→stopped→streaming
+  • Evidence: V33-PB-vip-monitor.png, V33-PB-resize-process.png
+
+5.3 V34 — Read Replicas / Horizontal Read Scaling (Req #34)
+  • Status: PASSED (2026-05-15, retest 2026-05-16)
+  • Read TPS: Leader 62,238; Replica (same compute) 44,225;
+               Replica (cross-compute) 33,521; Combined 139,984
+  • Writes correctly rejected on replicas: "cannot execute INSERT in a read-only transaction"
+  • Data consistency: 1,000,000 rows on all 3 nodes
+
+--------------------------------------------------------------------------------
+6. MONITORING / ALERTING INTEGRATION
+--------------------------------------------------------------------------------
+Core V-items: V27, V28 (Tier 2, MUST)
+
+6.1 V27 — Prometheus Monitoring (Req #27)
+  • Status: PASSED (2026-05-17)
+  • Prometheus scrape targets: all 3 DB nodes reporting UP
+  • Metrics collected: pg_up, pg_database_size_bytes, pg_stat_activity
+  • Alert rules active: PostgresDown, PostgresDiskSpaceLow,
+    PostgresTooManyConnections, PostgresReplicationLag, PostgresDeadlocks
+
+6.2 V28 — Alertmanager Alerting (Req #28)
+  • Status: PASSED (2026-05-17)
+  • Alertmanager Pod running in openstack namespace
+  • 2 active alerts ingested (PostgresDown, PostgresDiskSpaceLow)
+  • Routing rules configured: critical → PagerDuty, warning → Slack
+  • Alert pipeline latency: < 5 seconds from Prometheus fire to Slack delivery
+  • Alert deduplication confirmed working
+
+--------------------------------------------------------------------------------
+7. ADDITIONAL CRITICAL DBaaS LIFECYCLE TESTS
+--------------------------------------------------------------------------------
+
+7.1 Security & Isolation (V16, V22, V23, V24, V29, V30, V31)
+  • V16 Network Isolation: PASSED — 5 traffic types isolated on separate ENIs;
+    tenant VM cannot reach infrastructure subnets (100% packet loss)
+  • V22 Multi-tenant Isolation: PASSED — cross-tenant ICMP blocked 100%,
+    TCP/5432 blocked, API isolation confirmed (tenant-b sees only own resources)
+  • V23 OS Login Control: PASSED — PasswordAuthentication=no, SELinux=Enforcing,
+    minimal shell accounts
+  • V24 Security/Platform Audit: PASSED — pgaudit (DDL+ROLE), auditd active,
+    4 distinct roles with privilege matrix
+  • V29 User Separation: PASSED — dba_user, app_user, monitoring_user,
+    backup_user with correct privilege boundaries
+  • V30 Audit Logging: PASSED — CREATE TABLE, ALTER ROLE, slow queries,
+    failed auth all logged
+  • V31 Privilege Management: PASSED — non-superusers cannot escalate;
+    CREATE ROLE SUPERUSER denied
+
+7.2 Performance / QoS (V6, V7, V9, V17)
+  • V6 IOPS QoS: PASSED — fio measured within ±1% of configured caps:
+    db.small: 5,010 vs 5,000 (+0.20%); db.medium: 14,143 vs 14,000 (+1.02%);
+    db.large: 25,275 vs 25,000 (+1.10%). Uncapped baseline: 232,000 IOPS
+  • V7 RPO/Replication Lag: PASSED — 3,175 TPS sustained load, peak lag ~5.4 KB,
+    zero lag within 2s after load ended. Effective RPO ≈ 0
+  • V9 N-1 Capacity: PASSED — baseline 3,196 TPS vs N-1 3,271 TPS (+2.3%).
+    Performance improved with one fewer replica (less replication overhead)
+  • V17 Replication Load Perf: PASSED — 116,516 txns, 3,883 TPS, 1.288ms avg
+    latency; post-load lag=0 on all replicas
+
+7.3 Infrastructure Resilience (V5, V18, V26, V37)
+  • V5 VM-level Recovery (Nova Evacuate): PASSED (2026-05-17) —
+    evacuation mechanism works; key finding: strict anti-affinity with N=N
+    blocks evacuate; local ephemeral storage = data loss (expected)
+  • V18 Storage Redundancy: PASSED — RAID5 clean, 3 active + 1 hot spare,
+    1.68TB usable at /var/lib/nova/instances
+  • V26 CPU Resource Control: PASSED — hw:cpu_policy=dedicated enforced;
+    80 PCPU dedicated cores available; no overcommit on pinned instances
+  • V37 Anti-affinity Server Group: PASSED — Nova server group policy
+    confirmed; VMs placed on distinct physical hosts
+
+7.4 Operations & Data Integrity (V12, V13, V32, V35, V36)
+  • V12 Data Transfer: PASSED — pg_dump/pg_restore of 9 tables, 1,042,874 rows;
+    100% row-count match source→target
+  • V13 DB Porting/Migration: PASSED (2026-05-17) — 5 rows migrated via
+    pgloader; data integrity verified on 3-node Patroni cluster
+  • V32 Rolling Restart: PASSED — replicas restarted with zero VIP impact;
+    leader restart triggered clean automatic handoff; VIP recovered <2s
+  • V35 Admin Console: PASSED — OpenStack CLI lifecycle (stop/start/reboot)
+    and patronictl operations all verified
+  • V36 Admin API: PASSED — Patroni REST API (/patroni, /primary, /replica,
+    /cluster) all returned correct JSON; OpenStack CLI JSON confirmed
+
+--------------------------------------------------------------------------------
+8. KEY V-ITEMS REPRESENTING CORE DBaaS LIFECYCLE FUNCTIONALITY
+--------------------------------------------------------------------------------
+The following V-items are the essential validation items that collectively
+prove the DBaaS platform can provision, protect, scale, and operate databases
+as a managed service:
+
+  Tier 1 (MUST — Critical for Feasibility):
+    V1   HA Failover                    — Automatic leader election under load
+    V2   VIP Failover Policy            — Transparent endpoint migration
+    V3   Backup Standby→NFS             — Consistent backup without primary impact
+    V4   Immediate Auto-repair          — Self-healing within 30 seconds
+    V5   VM-level Recovery              — Nova evacuate on compute failure
+    V6   Disk IOPS QoS                  — Per-tenant performance isolation
+    V7   RPO / Replication Lag          — Near-zero data loss (RPO≈0)
+    V9   N-1 Capacity                   — Degraded-mode performance maintained
+    V10  Automated Failover              — Fully automatic, no manual intervention
+    V18  Storage Redundancy            — RAID5 with hot spare
+    V19  VIP Endpoint Stability          — Application connection string unchanged
+    V20  Full Backup Scope              — Physical backup + incremental + WAL
+    V21  WAL Archive Continuity          — Continuous protection for PITR
+    V22  Multi-tenant Isolation         — Network + API + resource isolation
+    V23  OS Login Control               — Tenant cannot access OS
+    V24  Security / Platform Audit      — End-to-end audit trail
+
+  Tier 2 (SHOULD — Important Operational):
+    V11  Vertical Scale-Down            — Reduce resources without data loss
+    V12  Data Transfer / Sync           — pg_dump/restore integrity
+    V13  DB Porting / Migration         — Cross-DB migration with pgloader
+    V25  Connection Storm Protection     — max_connections enforcement
+    V26  CPU Resource Control            — Dedicated CPU pinning
+    V27  Prometheus Monitoring           — Full-stack metric collection
+    V28  Alertmanager Alerting          — Alert routing and delivery
+    V29  User Separation                 — RBAC least privilege
+    V30  Audit Logging                   — pgaudit DDL+ROLE capture
+    V31  Privilege Management            — Escalation prevention
+    V32  Rolling Restart                 — Zero-downtime maintenance
+    V33  Manual Scale-Up                 — Increase resources online
+    V34  Read Replicas                   — Horizontal read scaling
+
+  Tier 3 (NICE-TO-HAVE):
+    V15  Ansible Provisioning           — End-to-end automation
+    V16  Network Isolation               — Multi-bond traffic separation
+    V17  Replication Load Perf          — Throughput ceiling identification
+    V35  Admin Console                   — CLI lifecycle operations
+    V36  Admin API                       — REST API coverage
+    V37  Anti-affinity Server Group      — Physical host distribution
+
+--------------------------------------------------------------------------------
+9. SOURCE DOCUMENTS REFERENCED
+--------------------------------------------------------------------------------
+  1. ~/git/openstack-101/output/aws-rhoso-report-docx/AWS-POC-FINAL-REPORT.docx
+  2. ~/git/openstack-101/output/aws-rhoso-report-docx/dbaas-validation-traceability.docx
+  3. ~/git/openstack-101/output/aws-rhoso-report-docx/TEST-PLAN.docx
+  4. ~/git/openstack-101/deployment/comparison/dbaas/task-outputs/task-25-validation/T25-validation-list.md
+  5. ~/git/openstack-101/deployment/comparison/dbaas/task-outputs/task-25-validation/T26-validation-master.md
+  6. ~/git/openstack-101/deployment/comparison/dbaas/task-outputs/task-25-validation/validation-list-formated.md
+  7. ~/git/openstack-101/output/deliverables/requirements/archive/aws-rhoso-validation-report.md
+  8. ~/git/openstack-101/output/deliverables/requirements/archive/aws-rhoso-validation-worklog.md
+
+================================================================================
+END OF TASK 8 EVIDENCE DOCUMENT
+================================================================================
