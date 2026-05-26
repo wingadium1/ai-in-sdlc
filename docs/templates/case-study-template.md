@@ -1,0 +1,650 @@
+---
+title: "OpenStack RHOSO DBaaS Proof of Concept — Case Study"
+subtitle: "A CASAN-Aligned Technical Case Study"
+date: 2026-05-26
+version: 1.0
+status: draft
+authors:
+  - name: [Author Name]
+    role: [Role]
+    organization: FPT
+reviewers:
+  - name: [Reviewer Name]
+    role: [Role]
+organization: FPT
+casan_level: Level 3 (Standard)
+tags:
+  - openstack
+  - rhoso
+  - dbaas
+  - poc
+  - casan
+  - case-study
+---
+
+# OpenStack RHOSO DBaaS Proof of Concept
+
+> **A CASAN-Aligned Technical Case Study**
+>
+> **Document Code**: [TO BE ASSIGNED]
+> **Effective Date**: [DATE]
+> **Version**: 1.0
+> **Status**: [draft | review | approved | published]
+
+---
+
+## Table of Contents
+
+1. [Executive Summary](#executive-summary)
+2. [Introduction](#introduction)
+3. [Background](#background)
+4. [Environment & Setup](#environment--setup)
+5. [PoC Execution](#poc-execution)
+6. [CASAN Framework Mapping](#casan-framework-mapping)
+7. [Results & Verification](#results--verification)
+8. [Handoffs & Process](#handoffs--process)
+9. [Lessons Learned](#lessons-learned)
+10. [Conclusion](#conclusion)
+11. [Appendices](#appendices)
+
+---
+
+## Executive Summary
+
+<!-- TODO: Fill in after PoC completion. This section should be written last but appear first. -->
+
+### TL;DR
+
+<!-- TODO: 3-5 sentence summary of the entire PoC. What was done, what was found, what was concluded. -->
+
+### Key Findings
+
+<!-- TODO: Bullet list of 5-7 most important findings from the PoC -->
+
+- Finding 1: [Brief statement]
+- Finding 2: [Brief statement]
+- Finding 3: [Brief statement]
+- Finding 4: [Brief statement]
+- Finding 5: [Brief statement]
+
+### Scope
+
+<!-- TODO: Define what was in scope and out of scope for this PoC -->
+
+**In Scope**:
+- [Item 1]
+- [Item 2]
+
+**Out of Scope**:
+- [Item 1]
+- [Item 2]
+
+### CASAN Level Assessment
+
+<!-- TODO: Reference Section 6 for detailed mapping. State the overall CASAN level achieved. -->
+
+This PoC demonstrates activities at **CASAN Level [X]** ([Level Name]), with specific mappings detailed in [Section 6](#casan-framework-mapping).
+
+---
+
+## 1. Introduction
+
+### 1.1 Context
+
+<!-- TODO: Describe the business or technical context that led to this PoC -->
+
+<!-- TODO: Insert content from Task 2 (Baseline Research) - background context -->
+
+### 1.2 Objectives
+
+<!-- TODO: List the specific objectives of this PoC -->
+
+**Primary Objectives**:
+- [Objective 1]
+- [Objective 2]
+- [Objective 3]
+
+**Secondary Objectives**:
+- [Objective 1]
+- [Objective 2]
+
+### 1.3 Methodology
+
+<!-- TODO: Describe the approach and methodology used in this PoC -->
+
+This case study follows the CASAN framework methodology for AI-native capability assessment. The PoC execution is documented with:
+
+- Structured phase packets for each major activity
+- Evidence collection at each validation checkpoint
+- CASAN level mapping for all AI-assisted activities
+- Formal handoff records between phases
+
+### 1.4 Document Structure
+
+<!-- TODO: Briefly explain how this document is organized -->
+
+This case study is organized as follows:
+
+- **Section 2** provides background on OpenStack, RHOSO, and DBaaS technologies
+- **Section 3** documents the environment setup and validation results
+- **Section 4** describes the PoC execution narrative
+- **Section 5** maps PoC activities to CASAN maturity levels
+- **Section 6** presents results and verification evidence
+- **Section 7** documents handoffs and process flows
+- **Section 8** captures lessons learned and recommendations
+- **Section 9** provides conclusions and next steps
+- **Appendices** contain references, glossary, and evidence index
+
+---
+
+## 2. Background
+
+<!-- TODO: This section references Task 2 (Baseline Research). Summarize key concepts for readers unfamiliar with the technologies. -->
+
+### 2.1 OpenStack Fundamentals
+
+<!-- TODO: Insert condensed content from `docs/research/openstack-rhoso-baseline.md` Section 1 -->
+
+<!-- TODO: Include:
+- What is OpenStack
+- Core architecture (control plane, data plane, message bus, database)
+- Core services (Keystone, Nova, Neutron, Glance, Cinder)
+- Deployment models
+-->
+
+### 2.2 RHOSO (Red Hat OpenStack Services on OpenShift)
+
+<!-- TODO: Insert condensed content from `docs/research/openstack-rhoso-baseline.md` Section 2 -->
+
+<!-- TODO: Include:
+- What is RHOSO
+- Two-plane architecture (control plane on OpenShift, data plane on RHEL)
+- Key Operators
+- Deployment workflow
+- CLI tools (oc and openstack)
+-->
+
+### 2.3 DBaaS on OpenStack
+
+<!-- TODO: Insert condensed content from `docs/research/openstack-rhoso-baseline.md` Section 3 -->
+
+<!-- TODO: Include:
+- What is DBaaS
+- OpenStack Trove architecture
+- Supported databases
+- CLI commands and workflows
+- Alternatives to Trove (cloud-native operators)
+-->
+
+### 2.4 Key Concepts and Terminology
+
+<!-- TODO: Include glossary of key terms used throughout this document -->
+
+<!-- TODO: Reference full glossary in Appendix A -->
+
+---
+
+## 3. Environment & Setup
+
+<!-- TODO: This section references Task 1 (Environment Validation). Document the infrastructure validation results. -->
+
+### 3.1 Infrastructure Overview
+
+<!-- TODO: Describe the target environment for the PoC -->
+
+**Environment Type**: [e.g., AWS RHOSO, on-premises RHOSO, development cluster]
+
+**Cluster Configuration**:
+- OpenShift version: [version]
+- RHOSO version: [version]
+- Number of worker nodes: [count]
+- Compute node configuration: [specs]
+
+### 3.2 Validation Results
+
+<!-- TODO: Insert summary from `docs/environment-validation.md` -->
+
+<!-- TODO: Include the validation summary table from Task 1 -->
+
+| Category | Pass Rate | Verdict |
+|----------|-----------|---------|
+| Architecture Documentation | [X]/[Y] | [PASS/FAIL] |
+| Deployment Documentation | [X]/[Y] | [PASS/FAIL] |
+| Service Documentation | [X]/[Y] | [PASS/FAIL] |
+| Operations Documentation | [X]/[Y] | [PASS/FAIL] |
+| FPT Cloud DBaaS Extraction | [X]/[Y] | [PASS/FAIL] |
+| Validation & QA Documentation | [X]/[Y] | [PASS/FAIL] |
+| Historical Evidence | [X]/[Y] | [PASS/FAIL] |
+
+**Overall Verdict**: [CONDITIONAL PASS / PASS / FAIL]
+
+### 3.3 Known Gaps
+
+<!-- TODO: Document any gaps identified during environment validation -->
+
+<!-- TODO: Reference the "Known Gaps" section from Task 1 -->
+
+| Gap | Severity | Details |
+|-----|----------|---------|
+| [Gap 1] | [HIGH/MEDIUM/LOW] | [Description] |
+| [Gap 2] | [HIGH/MEDIUM/LOW] | [Description] |
+
+### 3.4 Access and Credentials
+
+<!-- TODO: Document how access was obtained (do NOT include actual credentials) -->
+
+**Access Method**: [e.g., bastion host, direct cluster access, VPN]
+
+**Credential Management**: [e.g., environment variables, secret store, OpenShift secrets]
+
+> **Security Note**: Actual credentials are never stored in this document. Credentials are managed via [method] and accessed only during PoC execution.
+
+---
+
+## 4. PoC Execution
+
+<!-- TODO: This section documents the step-by-step deployment narrative. Reference content from Tasks 8, 9, 10 as they are completed. -->
+
+### 4.1 Pre-Execution Checklist
+
+<!-- TODO: List all prerequisites that were verified before starting PoC execution -->
+
+- [ ] Prerequisite 1
+- [ ] Prerequisite 2
+- [ ] Prerequisite 3
+
+### 4.2 Phase 1: [Phase Name]
+
+<!-- TODO: Insert content from Task 8 (or subsequent execution tasks) -->
+
+**Objective**: [What this phase aimed to accomplish]
+
+**Activities**:
+1. [Activity 1]
+2. [Activity 2]
+3. [Activity 3]
+
+**Evidence**: [Reference to evidence files in `.sisyphus/evidence/`]
+
+**Outcome**: [What was achieved]
+
+### 4.3 Phase 2: [Phase Name]
+
+<!-- TODO: Insert content from Task 9 (or subsequent execution tasks) -->
+
+**Objective**: [What this phase aimed to accomplish]
+
+**Activities**:
+1. [Activity 1]
+2. [Activity 2]
+3. [Activity 3]
+
+**Evidence**: [Reference to evidence files]
+
+**Outcome**: [What was achieved]
+
+### 4.4 Phase 3: [Phase Name]
+
+<!-- TODO: Insert content from Task 10 (or subsequent execution tasks) -->
+
+**Objective**: [What this phase aimed to accomplish]
+
+**Activities**:
+1. [Activity 1]
+2. [Activity 2]
+3. [Activity 3]
+
+**Evidence**: [Reference to evidence files]
+
+**Outcome**: [What was achieved]
+
+### 4.5 Execution Timeline
+
+<!-- TODO: Provide a timeline of the PoC execution -->
+
+| Date | Phase | Key Milestone | Status |
+|------|-------|---------------|--------|
+| YYYY-MM-DD | Phase 1 | [Milestone] | Completed |
+| YYYY-MM-DD | Phase 2 | [Milestone] | Completed |
+| YYYY-MM-DD | Phase 3 | [Milestone] | Completed |
+
+---
+
+## 5. CASAN Framework Mapping
+
+<!-- TODO: This section references Task 3 (CASAN Analysis). Map PoC activities to CASAN maturity levels. -->
+
+### 5.1 CASAN Levels Overview
+
+<!-- TODO: Briefly describe the five CASAN levels for context -->
+
+<!-- TODO: Reference `docs/research/casan-mapping-rubric.md` Section 2 for full definitions -->
+
+| Level | Name | Description |
+|-------|------|-------------|
+| 1 | Curious | Individual exploration, no governance |
+| 2 | Augmented | Licensed tools, individual productivity |
+| 3 | Standard | Standardized, governed, repeatable |
+| 4 | Automated | AI Agents operate workflows |
+| 5 | Native | AI is core operating system |
+
+### 5.2 PoC Activity Classification
+
+<!-- TODO: Insert content from Task 3 (CASAN Mapping Rubric) -->
+
+<!-- TODO: Use the table format from `docs/research/casan-mapping-rubric.md` Section 5.2 -->
+
+| PoC Activity | CASAN Level | Delegation Level | Rationale |
+|--------------|-------------|------------------|-----------|
+| [Activity 1] | Level [X] | L[0-5] | [Why this level] |
+| [Activity 2] | Level [X] | L[0-5] | [Why this level] |
+| [Activity 3] | Level [X] | L[0-5] | [Why this level] |
+
+### 5.3 GSD/OMO Workflow Mapping
+
+<!-- TODO: Map the GSD/OMO workflows used during PoC to CASAN levels -->
+
+<!-- TODO: Reference `docs/research/casan-mapping-rubric.md` Section 5.3 -->
+
+| GSD/OMO Workflow Element | CASAN Level | Delegation Level | Notes |
+|--------------------------|-------------|------------------|-------|
+| [Workflow 1] | Level [X] | L[0-5] | [Notes] |
+| [Workflow 2] | Level [X] | L[0-5] | [Notes] |
+
+### 5.4 Harness Maturity Assessment
+
+<!-- TODO: Assess the Harness maturity across the seven components -->
+
+<!-- TODO: Reference `docs/research/casan-mapping-rubric.md` Section 3.1 -->
+
+| Harness Component | Maturity Level | Evidence |
+|-------------------|----------------|----------|
+| Context Harness | [Level] | [Evidence] |
+| Tool Harness | [Level] | [Evidence] |
+| Validation Harness | [Level] | [Evidence] |
+| Security Harness | [Level] | [Evidence] |
+| Governance Harness | [Level] | [Evidence] |
+| AgentOps Harness | [Level] | [Evidence] |
+| Orchestration Harness | [Level] | [Evidence] |
+
+### 5.5 Key Mapping Principles Applied
+
+<!-- TODO: Document which mapping principles from Task 3 were applied -->
+
+<!-- TODO: Reference `docs/research/casan-mapping-rubric.md` Section 5.4 -->
+
+1. [Principle 1 and how it was applied]
+2. [Principle 2 and how it was applied]
+3. [Principle 3 and how it was applied]
+
+---
+
+## 6. Results & Verification
+
+<!-- TODO: Document the test outcomes and evidence collected during the PoC -->
+
+### 6.1 Test Objectives
+
+<!-- TODO: List the test objectives that were defined for the PoC -->
+
+- [Test Objective 1]
+- [Test Objective 2]
+- [Test Objective 3]
+
+### 6.2 Test Results Summary
+
+<!-- TODO: Provide a summary of all test results -->
+
+| Test ID | Objective | Result | Status | Evidence |
+|---------|-----------|--------|--------|----------|
+| T-01 | [Objective] | [Result] | PASS/FAIL | [Link] |
+| T-02 | [Objective] | [Result] | PASS/FAIL | [Link] |
+| T-03 | [Objective] | [Result] | PASS/FAIL | [Link] |
+
+### 6.3 Verification Evidence
+
+<!-- TODO: Index the evidence collected during verification -->
+
+**Evidence Location**: `.sisyphus/evidence/`
+
+| Evidence ID | Description | Type | Location |
+|-------------|-------------|------|----------|
+| E-01 | [Description] | [Screenshot/Log/Config] | [File path] |
+| E-02 | [Description] | [Screenshot/Log/Config] | [File path] |
+| E-03 | [Description] | [Screenshot/Log/Config] | [File path] |
+
+### 6.4 Success Criteria
+
+<!-- TODO: Define what success looked like and whether it was achieved -->
+
+| Criterion | Target | Actual | Met? |
+|-----------|--------|--------|------|
+| [Criterion 1] | [Target] | [Actual] | Yes/No |
+| [Criterion 2] | [Target] | [Actual] | Yes/No |
+| [Criterion 3] | [Target] | [Actual] | Yes/No |
+
+### 6.5 Deviations and Issues
+
+<!-- TODO: Document any deviations from plan or issues encountered -->
+
+| Issue ID | Description | Impact | Resolution |
+|----------|-------------|--------|------------|
+| I-01 | [Description] | [Impact] | [Resolution] |
+| I-02 | [Description] | [Impact] | [Resolution] |
+
+---
+
+## 7. Handoffs & Process
+
+<!-- TODO: Document formal handoff records between phases and teams -->
+
+### 7.1 Phase Handoffs
+
+<!-- TODO: Document handoffs between PoC phases -->
+
+| Handoff ID | From Phase | To Phase | Date | Status |
+|------------|------------|----------|------|--------|
+| H-01 | Phase 1 | Phase 2 | YYYY-MM-DD | Completed |
+| H-02 | Phase 2 | Phase 3 | YYYY-MM-DD | Completed |
+
+### 7.2 Team Handoffs
+
+<!-- TODO: Document handoffs between team members or roles -->
+
+| Handoff ID | From | To | Date | Artifacts Transferred |
+|------------|------|-----|------|----------------------|
+| H-03 | [Role 1] | [Role 2] | YYYY-MM-DD | [List] |
+
+### 7.3 Process Flow
+
+<!-- TODO: Document the overall process flow followed during the PoC -->
+
+<!-- TODO: Consider including a mermaid diagram here -->
+
+```mermaid
+graph TD
+    A[Phase 1] --> B[Handoff 1]
+    B --> C[Phase 2]
+    C --> D[Handoff 2]
+    D --> E[Phase 3]
+    E --> F[Verification]
+```
+
+### 7.4 Decision Records
+
+<!-- TODO: Link to or summarize key decisions made during the PoC -->
+
+| Decision ID | Description | Date | Decision Maker | Outcome |
+|-------------|-------------|------|----------------|---------|
+| D-01 | [Description] | YYYY-MM-DD | [Name/Role] | [Outcome] |
+| D-02 | [Description] | YYYY-MM-DD | [Name/Role] | [Outcome] |
+
+---
+
+## 8. Lessons Learned
+
+<!-- TODO: Capture insights, challenges, and recommendations from the PoC -->
+
+### 8.1 What Went Well
+
+<!-- TODO: Document successes and positive outcomes -->
+
+- [Success 1]: [Description]
+- [Success 2]: [Description]
+- [Success 3]: [Description]
+
+### 8.2 Challenges Encountered
+
+<!-- TODO: Document challenges and how they were addressed -->
+
+| Challenge | Impact | Mitigation | Lesson |
+|-----------|--------|------------|--------|
+| [Challenge 1] | [Impact] | [Mitigation] | [Lesson] |
+| [Challenge 2] | [Impact] | [Mitigation] | [Lesson] |
+
+### 8.3 Recommendations
+
+<!-- TODO: Provide recommendations for future PoCs or production deployment -->
+
+**For Future PoCs**:
+- [Recommendation 1]
+- [Recommendation 2]
+- [Recommendation 3]
+
+**For Production Deployment**:
+- [Recommendation 1]
+- [Recommendation 2]
+- [Recommendation 3]
+
+### 8.4 CASAN Level Progression
+
+<!-- TODO: Recommend next steps for CASAN level progression based on PoC findings -->
+
+**Current Level**: Level [X] ([Level Name])
+
+**Recommended Next Level**: Level [Y] ([Level Name])
+
+**Key Actions Required**:
+- [Action 1]
+- [Action 2]
+- [Action 3]
+
+<!-- TODO: Reference `docs/research/casan-mapping-rubric.md` Section 10 for transition paths -->
+
+---
+
+## 9. Conclusion
+
+<!-- TODO: Summarize the PoC and outline next steps -->
+
+### 9.1 Summary
+
+<!-- TODO: Provide a concise summary of the entire PoC -->
+
+<!-- TODO: This should expand on the TL;DR in the Executive Summary -->
+
+### 9.2 Key Takeaways
+
+<!-- TODO: List the most important takeaways from the PoC -->
+
+1. [Takeaway 1]
+2. [Takeaway 2]
+3. [Takeaway 3]
+
+### 9.3 Next Steps
+
+<!-- TODO: Outline recommended next steps -->
+
+**Immediate Actions** (within 1 month):
+- [Action 1]
+- [Action 2]
+
+**Short-term Actions** (1-3 months):
+- [Action 1]
+- [Action 2]
+
+**Long-term Actions** (3+ months):
+- [Action 1]
+- [Action 2]
+
+### 9.4 Final Assessment
+
+<!-- TODO: Provide a final overall assessment of the PoC -->
+
+**PoC Verdict**: [SUCCESS / PARTIAL SUCCESS / DID NOT MEET OBJECTIVES]
+
+**Confidence Level**: [HIGH / MEDIUM / LOW]
+
+**Recommendation**: [Proceed to production / Conduct additional PoC / Do not proceed]
+
+---
+
+## Appendices
+
+### Appendix A: Glossary
+
+<!-- TODO: Include comprehensive glossary of terms -->
+
+<!-- TODO: Reference `docs/research/openstack-rhoso-baseline.md` Section 7 -->
+
+| Term | Definition |
+|------|------------|
+| [Term 1] | [Definition] |
+| [Term 2] | [Definition] |
+| [Term 3] | [Definition] |
+
+### Appendix B: References
+
+<!-- TODO: List all references cited in this document -->
+
+<!-- TODO: Reference `docs/research/openstack-rhoso-baseline.md` Section 8 -->
+
+1. [Reference 1]
+2. [Reference 2]
+3. [Reference 3]
+
+### Appendix C: Evidence Index
+
+<!-- TODO: Complete index of all evidence files -->
+
+| Evidence ID | File Path | Description | Related Section |
+|-------------|-----------|-------------|-----------------|
+| E-01 | `.sisyphus/evidence/[file]` | [Description] | [Section] |
+| E-02 | `.sisyphus/evidence/[file]` | [Description] | [Section] |
+
+### Appendix D: Phase Packet Index
+
+<!-- TODO: Index of all PhasePackets generated during the PoC -->
+
+| Phase | Work Item ID | Packet Location | Status |
+|-------|--------------|-----------------|--------|
+| Phase 1 | [ID] | `.sdlc/phases/[id]/phase-1.json` | Completed |
+| Phase 2 | [ID] | `.sdlc/phases/[id]/phase-2.json` | Completed |
+| Phase 3 | [ID] | `.sdlc/phases/[id]/phase-3.json` | Completed |
+
+### Appendix E: Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 0.1 | YYYY-MM-DD | [Name] | Initial draft |
+| 0.2 | YYYY-MM-DD | [Name] | Added [sections] |
+| 1.0 | YYYY-MM-DD | [Name] | Final version |
+
+---
+
+## Document Control
+
+**Classification**: [Internal / Confidential / Public]
+
+**Distribution**: [List of authorized recipients]
+
+**Review Cycle**: [e.g., Annual, Per PoC, On-demand]
+
+**Retention Period**: [e.g., 3 years, Indefinite]
+
+---
+
+*This case study template is designed for the OpenStack RHOSO DBaaS Proof of Concept. The template follows CASAN framework methodology and is intended to capture comprehensive technical and process documentation for knowledge transfer and organizational learning.*
+
+*Template Version: 1.0*
+*Created: 2026-05-26*
