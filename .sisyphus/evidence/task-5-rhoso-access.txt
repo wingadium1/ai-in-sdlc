@@ -1,0 +1,394 @@
+================================================================================
+TASK 5: RHOSO Environment Setup Documentation
+================================================================================
+Date:        2026-05-26
+Source:      ~/git/openstack-101/
+Scope:       Document RHOSO environment configuration based on existing outputs
+              and documentation. NO infrastructure was accessed or deployed.
+================================================================================
+
+1. PRIMARY RHOSO DEPLOYMENT DOCUMENTATION
+--------------------------------------------------------------------------------
+File: deployment/rhosp/README.md (214 lines, status: stable, dated 2026-03-19)
+
+1.1 Architecture Overview
+- Product: Red Hat OpenStack Services on OpenShift (RHOSO), aka RHOSP 18
+- OpenStack Version: 2024.2 (Dalmatian)
+- Control Plane: Podified architecture running on Red Hat OpenShift Container
+  Platform (RHOCP) 4.18+
+- Data Plane: Bare-metal RHEL 9 compute nodes (Libvirt + OVS/OVN agents)
+- Orchestration: Kubernetes-native Operator framework (replaces TripleO/Director)
+
+1.2 Control Plane Components (running as pods on OpenShift)
+- Keystone (Identity)
+- Nova (Compute orchestration)
+- Neutron (Networking)
+- Cinder (Block storage)
+- Glance (Image service)
+- MariaDB/Galera (Database — managed by Galera Operator)
+- RabbitMQ (Messaging — managed by RabbitMQ Cluster Operator)
+- OVN (Open Virtual Network — exclusive network backend)
+
+1.3 Key Custom Resources (CRDs)
+- OpenStackControlPlane (top-level CR defining entire control plane state)
+- KeystoneAPI (service-specific CR for Identity)
+- OpenStackDataPlaneNodeSet (defines compute node configuration)
+- NodeNetworkConfigurationPolicy (NNCP) via nmstate operator
+
+1.4 High Availability
+- Pod HA: OpenShift Scheduler + ReplicaSets
+- Database HA: Galera Operator (MariaDB cluster)
+- Messaging HA: RabbitMQ Cluster Operator
+- API Routing: OpenShift Services/Routes (replaces HAProxy/Keepalived)
+
+1.5 Storage Integration
+- Preferred backend: Red Hat Ceph Storage 8 (RHCS 8)
+- Cinder/Glance/Nova use Ceph RBD
+- Manila uses CephFS
+- Secrets stored as OpenShift Secrets
+
+1.6 Deployment Workflow (6 steps)
+  1. Install OpenShift (RHOCP 4.18+)
+  2. Install Operators via OLM
+  3. Configure Networking (NNCPs)
+  4. Deploy Control Plane (OpenStackControlPlane CR)
+  5. Provision Data Plane (OpenStackDataPlaneNodeSet CR)
+  6. Verification (service connectivity, VM spawning)
+
+1.7 Prerequisites
+- RHOCP 4.18+ (mandatory)
+- Valid Red Hat subscriptions (OpenShift, OpenStack, Ceph)
+- Bare-metal servers for Compute nodes (RHEL 9 support)
+- Minimum 3 Master + 3 Worker nodes for OpenShift control plane
+
+1.8 Limitations
+- Requires expertise in both Kubernetes/OpenShift and OpenStack
+- Full OpenShift cluster overhead just for OpenStack control plane
+- Customization limited to CRD schema exposure
+- Hard dependency on OpenShift lifecycle and networking model
+
+================================================================================
+
+2. OPENSHIFT VERSION REQUIREMENTS
+--------------------------------------------------------------------------------
+- Minimum version: RHOCP 4.18+
+- Topology: Minimum 3 Master + 3 Worker nodes for reliable control plane hosting
+- For compact/physical labs: 3-node compact cluster (control+worker converged) is
+  used in the physical environment draft (see Section 4)
+
+================================================================================
+
+3. OPERATOR-BASED DEPLOYMENT MODEL
+--------------------------------------------------------------------------------
+- Each OpenStack service has its own Operator (e.g., Keystone Operator, Nova
+  Operator, OpenStackDataPlane Operator)
+- Operators watch CRDs and reconcile actual pod state to match desired spec
+- OLM (Operator Lifecycle Manager) handles installation and updates
+- Upgrades are declarative:
+  * Minor: Updating Operator version triggers rolling pod updates
+  * Major: Updating OpenStackControlPlane spec triggers orchestrated DB schema
+    and service updates
+  * Data Plane: Updating NodeSet CR triggers Ansible playbooks for RPM updates
+- GitOps native: Entire deployment defined by YAML CRs (ArgoCD/ACM compatible)
+- Monitoring: OpenShift monitoring stack (Prometheus/Grafana) via ServiceMonitors
+- Logging: OpenShift logging stack (Vector/Loki or Elasticsearch/Fluentd)
+- Tooling: `oc` commands and OpenStack CLI in toolset pods
+
+================================================================================
+
+4. PHYSICAL ENVIRONMENT SETUP (DRAFTS & WORKLOG)
+--------------------------------------------------------------------------------
+
+4.1 Physical RHOSO Installation Plan
+File: .sisyphus/drafts/physical-rhoso-install.md (61 lines)
+- Target: 5 physical Dell R640 servers at FPT DC
+- Topology:
+  * 3 OCP nodes: 3-node compact cluster (control+worker converged)
+  * 2 Compute nodes: EDPM (DataPlaneNodeSet) managed
+  * 3 DB VMs: Patroni PostgreSQL on 2 compute hosts
+- OCP Install Method: Agent-Based Install (ABI) using ISO + BMC/Redfish
+- Network Model: 5 planes mapped from AWS topology
+  * ctlplane (VLAN 10): EDPM SSH management
+  * internalapi (VLAN 11): OpenStack API
+  * tenant (VLAN 12): OVN overlay / DB replication
+  * storage/backup (VLAN 13): pgBackRest -> NAS
+  * provider (VLAN 14): br-ex uplink, VM access
+- Storage: Local disk RAID on compute for DB data
+- Backup: External NAS appliance (NFS mount for pgBackRest)
+- DNS: Required for OCP (api.*, *.apps.*)
+- Compute Provisioning: Pre-provisioned EDPM (RHEL 9.4, EDPM Ansible over SSH)
+- Switch: Cisco Nexus 9300 N9K-C93180YC-EX (10G/25G capable)
+
+4.2 Physical RHOSO Installation Worklog
+File: .sisyphus/drafts/worklog-ocp-install-20260523.md (132 lines)
+- Date: 2026-05-22 -> 2026-05-23
+- Environment: 5x Dell R640 physical nodes at FPT DC
+- Goal: Deploy OpenShift 4.18 via Assisted Installer -> RHOSO on bare-metal
+- SSH Scan Results (all 5 nodes reachable, RHEL 9.8):
+  * Server01: 10.192.66.12 (just provisioned)
+  * Server02: 10.192.66.13 (just provisioned)
+  * Server03: 10.192.66.14 (just provisioned)
+  * Server04: 10.192.66.15 (Compute node / EDPM, uptime 2d 20h)
+  * Server05: 10.192.66.16 (Compute node / EDPM, uptime 2d 20h)
+- Bond Issues Found:
+  * Server02: Bond1 DOWN (ens1f0 + ens1f1 link DOWN) -> CRITICAL
+  * Server03: ens1f0 UP but not in bond1 (1 slave) -> HIGH
+  * Server04: ens1f0np0 enslaved but link DOWN -> HIGH
+  * Server05: ens1f0np0 UP but not in bond1 -> HIGH
+- Assisted Installer Configuration:
+  * Cluster: rhoso.fsoft.local
+  * Profile: Compact Cluster (3-node, control-plane + worker)
+  * API VIP: 10.192.66.100
+  * Ingress VIP: 10.192.66.101
+  * Machine Network: 10.192.66.0/24
+  * Nodes: master-1 (Server01), master-2 (Server02), master-3 (Server03)
+- Fixes Applied:
+  * ARP cache pointing VIP to old bootstrap MAC -> cleared with ip neigh del
+  * DNS fsoft.local not resolving -> added hosts entries
+- Current Monitor Status (as of worklog date):
+  * API VIP (10.192.66.100:6443): DOWN (expected during install)
+  * 3 Nodes (10.192.66.12-14): PING OK (installing RHCOS)
+  * Ingress VIP (10.192.66.101): Not responding (will UP after cluster ready)
+  * AI UI Status: Installing (estimated 30-45 minutes)
+- Pending Issues:
+  * P0: Server02 Bond1 DOWN (needs provider fix switch port 1/3-4)
+  * P1: Server03 ens1f0 not in bond1
+  * P1: Server05 ens1f0np0 not in bond1
+  * P1: Data VLAN gateways (20,30,40,50) missing SVI on switch
+- Next Steps (from worklog):
+  * Monitor OCP install progress
+  * Post-install: get kubeconfig, verify cluster operators
+  * Fix bond issues on Server02/03/05 before RHOSO deploy
+  * Install RHOSO Operators (OpenStack, MariaDB, RabbitMQ, etc.)
+  * Deploy EDPM compute nodes (Server04-05)
+
+4.3 Physical RHOSO Validation Planning
+File: .sisyphus/drafts/physical-rhoso-validation.md (74 lines)
+- Scope: Architecture + validation planning (not implementation)
+- Prior AWS RHOSO PoC results: 34/36 passed = 94.4% pass rate
+- AWS-specific limitations documented: blocks gratuitous ARP, ENI/VIP movement
+  differs from physical L2, no physical NIC bonding, no hardware RAID testing
+- Physical re-validation recommended for: V1 (HA failover), V2 (VIP failover),
+  V5 (Nova evacuate), V8 (24h stability), V11/V33 (scale ops), V16 (bonding),
+  V18 (RAID/storage), V19 (VIP stability), V37 (anti-affinity)
+- Hardware quotation extracted:
+  * Server type A: Dell R640, Xeon Gold 6138 20C/40T, 128GB RAM,
+    2x480GB SATA SSD + 3x300GB SAS 10K HDD, PERC H730 RAID,
+    4x1Gb RJ45 + dual-port 25GbE SFP28, iDRAC 9
+  * Server type B: Dell R640, Xeon Gold 6138 20C/40T, 64GB RAM,
+    2x960GB SATA SSD, PERC H730 RAID,
+    4x1Gb RJ45 + dual-port 10GbE SFP+, iDRAC 9
+  * Switch: Cisco Nexus 9300 N9K-C93180YC-EX
+  * Bandwidth: domestic 1Gbps shared, international 10Mbps shared
+  * Public IPs: 5 addresses
+- Blocking decisions identified:
+  * KP-02: Local disk vs Ceph
+  * KP-03: NIC/network mapping (provider VLAN, GENEVE MTU, bonds)
+  * KP-05: RHOSO/OCP control plane placement (external vs built-in)
+
+================================================================================
+
+5. AWS RHOSO VALIDATION ENVIRONMENT (REFERENCE ARCHITECTURE)
+--------------------------------------------------------------------------------
+File: output/deliverables/requirements/archive/aws-rhoso-validation-env-plan_old.md
+(1534+ lines, extremely detailed step-by-step guide)
+
+5.1 Purpose
+- Build environment for executing DBaaS validation items (V1-V37) on RHOSO
+- Uses AWS EC2 as underlying infrastructure (i3.metal bare metal simulation)
+
+5.2 Architecture
+- OCP Cluster: 3x m5.xlarge (control) + 3x m5d.4xlarge (worker)
+- Compute Nodes: 3x EC2 i3.metal (bare metal, 8xNVMe 1.9TB each)
+- Provisioning: RHOSO Ironic via VirtualBMC (IPMI emulation over AWS EC2 API)
+- Monitoring + VirtualBMC: m5.large (10.0.0.20)
+- NFS Server: m5.large (10.0.13.10) for pgBackRest
+- Bastion: t3.medium (10.0.0.10, public EIP)
+
+5.3 Network Topology (AWS)
+- ocp-public: 10.0.0.0/24 (Bastion, Monitoring)
+- ocp-private: 10.0.1.0/24 (OCP internal)
+- ctlplane: 10.0.10.0/24 (Ironic PXE/DHCP, Ansible -> compute)
+- internalapi: 10.0.11.0/24 (OpenStack API)
+- tenant: 10.0.12.0/24 (OVN, PostgreSQL replication, VIP 10.0.12.10)
+- backup: 10.0.13.0/24 (pgBackRest -> NFS)
+
+5.4 Key Phases (11 total)
+  Phase 1: AWS Infrastructure (VPC, subnets, IGW, NAT, SGs, instances)
+  Phase 2: VirtualBMC Setup (IPMI emulation for Ironic)
+  Phase 3: OpenShift Cluster (4.18, IPI on AWS)
+  Phase 4: RHOSO Deployment with Ironic (Operators, secrets, control plane)
+  Phase 5: Ironic Node Enrollment & Provisioning (introspection, deploy)
+  Phase 6: RAID5 on All 3 Bare Metal Nodes (6+1 hot spare = ~11.4TB usable)
+  Phase 7: NFS Server Setup (pgBackRest repository)
+  Phase 8: OpenStack Resources (networks, flavors, images, server groups)
+  Phase 9: PostgreSQL + Patroni Cluster (3 VMs, anti-affinity, VIP)
+  Phase 10: Monitoring Stack (Prometheus, Alertmanager, Grafana, etcd DCS)
+  Phase 11: Final Verification (10 verification commands)
+
+5.5 Validation Coverage
+- 33/37 items testable on AWS environment
+- V18 (RAID5) testable on all 3 nodes (i3.metal 8xNVMe)
+- V16 (Network Isolation) only partially testable (no physical bonds on EC2)
+- Cost: ~$456/day with all nodes running; ~$97/day with OCP only
+
+================================================================================
+
+6. DATA PLANE CONFIGURATION
+--------------------------------------------------------------------------------
+- Nodes: Bare-metal RHEL 9 systems hosting VM instances
+- Management: OpenStackDataPlane Operator uses Ansible playbooks
+- Packages: Standard RHEL RPMs for Libvirt and OVS/OVN agents
+- No containers run on data plane nodes for workload hosting
+- Scaling: Update OpenStackDataPlaneNodeSet spec -> Operator triggers Ansible
+- Example CRD (from deployment/rhosp/README.md):
+  apiVersion: dataplane.openstack.org/v1beta1
+  kind: OpenStackDataPlaneNodeSet
+  spec:
+    nodes:
+      compute-0:
+        ansibleHost: 192.168.122.10
+      compute-1:
+        ansibleHost: 192.168.122.11
+    nodeTemplate:
+      ansibleSSHPrivateKeySecret: dataplane-ansible-ssh-priv-key
+      managementNetwork: ctlplane
+
+================================================================================
+
+7. NETWORK CONFIGURATION
+--------------------------------------------------------------------------------
+- Backend: OVN (Open Virtual Network) — exclusive
+- Declarative networking: NodeNetworkConfigurationPolicy (NNCP) via nmstate
+- Six primary network planes:
+  1. ctlplane: Management and provisioning
+  2. internalapi: Internal service communication
+  3. tenant: Overlay traffic for VM instances
+  4. storage: Traffic to/from storage backends
+  5. storagemgmt: Backend storage replication and management
+  6. external: External connectivity and Floating IPs
+- LoadBalancer: MetalLB within OpenShift for OpenStack API endpoints
+- Physical lab mapping (from physical-rhoso-install.md):
+  * ctlplane -> VLAN 10
+  * internalapi -> VLAN 11
+  * tenant -> VLAN 12
+  * storage/backup -> VLAN 13
+  * provider -> VLAN 14
+
+================================================================================
+
+8. VALIDATION EVIDENCE (SCREENSHOTS & GIFS)
+--------------------------------------------------------------------------------
+
+8.1 GIF Evidence (repo root)
+- bastion-oc-cluster-status.gif
+- bastion-oc-test.gif
+  Location: ~/git/openstack-101/
+  Content: Cluster status and test execution recordings
+
+8.2 PNG Evidence (AWS RHOSO validation)
+Location: ~/git/openstack-101/output/deliverables/requirements/aws-rhoso-validation-env-evidence/
+Selected files:
+- V1-cold-rollback-3node.png
+- V1-cold-post-failover.png
+- V1-hot-eni-move.png
+- V1-hot-final-state.png
+- V1-hot-new-leader.png
+- V1-hot-pgbench-running.png
+- V1-hot-tps-trace.png
+- V1-hot-vip-recovery.png
+- V11-PA-before-state.png
+- V11-PA-final-state.png
+- V11-PA-switchover-node1-to-node2.png
+- V11-PB-after-state.png
+- V11-scale-down-before.png
+- V11-scale-down-after.png
+- V19-after-state.png
+- V19-vip-stability.png
+- V27-03-connections.png
+- V30-V31-slow-query-failauth-escalation.png
+- V31-escalation-prevention.png
+- V33-PB-after-state.png
+- V33-scale-up-after.png
+- V9-pre-test-state.png
+- V9-T2-stop-and-restore.png
+- V9-n1-capacity-baseline-and-test.png
+- rt-v1-01-patroni-cluster-state.png
+- rt-v1-02-vip-and-callbacks.png
+- rt-v1-03-data-integrity-via-vip.png
+- rt-v1-04-vip-probe-1-fail.png
+- rt-v1-05-aws-eni-moved.png
+- rt-v1-hot-01-patroni-cluster-after-rejoin.png
+- rt-v1-hot-02-vip-bound-psql-via-vip.png
+- rt-v1-hot-03-pgbench-via-vip.png
+- v17-pgbench-10c-evidence.png
+- V26-cpu-remaining-capacity.png
+
+================================================================================
+
+9. DBAAS COMPARISON CONTEXT
+--------------------------------------------------------------------------------
+File: deployment/comparison/dbaas/README.md
+- Study compares Pattern-1 (SBKK Self-Built) vs Pattern-2 (FPT Cloud Platform)
+  against VMware DSM baseline
+- Current focus: PostgreSQL only (Phase 1)
+- 34 deliverables documented (architecture, feature, operations, constraints,
+  timeline, technical verification, scope contracts, interface contracts,
+  decision packages, Ansible deep dives, capacity plans, secrets strategy,
+  assessment frameworks, network topology comparisons)
+- Key deliverable: 37-openstack-services-for-dbaas.md maps Nova, Neutron,
+  Cinder, Glance, Keystone + supporting services to 64 DBaaS requirements
+
+================================================================================
+
+10. GAPS IDENTIFIED
+--------------------------------------------------------------------------------
+10.1 Physical Validation Incomplete
+- physical-rhoso-validation.md exists but is a draft with open questions
+- No completed physical validation evidence exists
+- Physical environment OCP installation was IN PROGRESS as of 2026-05-23
+  (worklog shows AI UI status: Installing, API VIP down, bond issues pending)
+
+10.2 Bond/Network Issues (Physical)
+- Server02: Bond1 DOWN (critical)
+- Server03/05: ens1f0 not in bond1 (high)
+- Server04: ens1f0np0 enslaved but link DOWN (high)
+- Data VLAN gateways (20,30,40,50) missing SVI on switch
+
+10.3 Blocking Decisions (Physical)
+- KP-02: Local disk vs Ceph storage strategy unresolved
+- KP-03: NIC/network mapping (provider VLAN, GENEVE MTU, management/tenant/backup
+  bonds) unresolved
+- KP-05: RHOSO/OCP control plane placement unresolved (external OCP vs built
+  on 5 hosts vs Kolla-Ansible alternative)
+
+10.4 Documentation Gaps
+- deployment/rhosp/README.md is comprehensive and stable (no gap)
+- Physical installation docs are draft-level only
+- No evidence file showing completed physical RHOSO deployment
+
+================================================================================
+
+11. FILE REFERENCE INDEX
+--------------------------------------------------------------------------------
+Primary Sources:
+  ~/git/openstack-101/deployment/rhosp/README.md
+  ~/git/openstack-101/.sisyphus/drafts/physical-rhoso-install.md
+  ~/git/openstack-101/.sisyphus/drafts/worklog-ocp-install-20260523.md
+  ~/git/openstack-101/.sisyphus/drafts/physical-rhoso-validation.md
+  ~/git/openstack-101/output/deliverables/requirements/archive/aws-rhoso-validation-env-plan_old.md
+  ~/git/openstack-101/deployment/comparison/dbaas/README.md
+
+Evidence Files:
+  ~/git/openstack-101/bastion-oc-cluster-status.gif
+  ~/git/openstack-101/bastion-oc-test.gif
+  ~/git/openstack-101/output/deliverables/requirements/aws-rhoso-validation-env-evidence/*.png
+
+Related Architecture:
+  ~/git/openstack-101/output/deliverables/architecture/37-openstack-services-for-dbaas.md
+  ~/git/openstack-101/output/deliverables/architecture/45-assessment-network-design.md
+  ~/git/openstack-101/output/deliverables/ha-database/38-postgresql-ha-pgpool-vs-patroni.md
+
+================================================================================
+END OF TASK 5 EVIDENCE FILE
+================================================================================
