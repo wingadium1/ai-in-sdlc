@@ -1,0 +1,62 @@
+# Evidence: Case Study Update - Challenges & AI-Augmented Work
+
+## Task Completion: 2026-05-26
+
+### Files Modified:
+1. deliverables/openstack-rhoso-dbaas-casestudy.md
+   - Added section 1.4: Why GSD/OMO Over GitHub Copilot (6-row comparison table)
+   - Added section 1.5: AI-Augmented Repetitive Work That Required Thinking (3 examples)
+   - Added section 1.6: Technical Challenges Encountered (4 challenges)
+   - Renamed existing 1.4→1.7: Document Structure
+
+2. deliverables/slides-challenges.md
+   - Created 5-slide deck for Gemini App import
+   - Slide 1: Why GSD/OMO Over GitHub Copilot
+   - Slide 2: AI-Augmented Work That Required Thinking
+   - Slide 3: Technical Challenges
+   - Slide 4: Key Takeaways
+   - Slide 5: Evidence & Verification
+
+### Evidence from openstack-101 Git History:
+
+Validation Retest Commits (14 total):
+- fc99609: fix(validation): V4 retest with 2-terminal downtime measurement
+- 31ebb4b: fix(validation): V11-PB retest with VIP ping during resize
+- 10b6554: fix(validation): V12 full pg_dump/pg_restore retest with data integrity evidence
+- f3a7cf2: fix(validation): V19 retest with 2-terminal VIP stability during switchover
+- 360de45: fix(validation): V26 retest with host aggregate overcommit simulation
+- 5092899: fix(validation): V32 retest with multi-terminal rolling restart evidence
+- dbe06e8: fix(validation): V33-PB retest with 2-terminal VIP ping during replica resize
+
+OVS Flow Script Commits:
+- 04a70be: fix(scripts): batch SSH in apply-aws-ovs-flows-100g to prevent timeout
+- f5d5e82: feat(scripts): parameterize apply-aws-ovs-flows-100g.sh
+
+### Key Content Added:
+
+Section 1.4 - Copilot Limitations Table:
+| Limitation | Impact | GSD/OMO Solution |
+|------------|--------|------------------|
+| Single-file context only | Cannot understand 5+ services across 50+ files | explore/librarian subagents with full repo access |
+| No planning capability | Cannot sequence 11 tasks across 5 waves | GSD dependency matrix, parallel execution |
+| No multi-agent orchestration | No specialized agent delegation | 3-4 agents dispatched simultaneously per wave |
+| No evidence-based verification | Cannot validate against acceptance criteria | Agent-executed QA, 15 evidence files |
+| No context persistence | Lost between sessions | Notepad system across 15 task dispatches |
+| No governance/audit trail | No record for CASAN compliance | Handoffs (HO-001 to HO-005), decisions (D01-D10) |
+
+Section 1.5 - AI-Augmented Work Examples:
+1. Automated Validation Retest Cycles (14 iterations) - diagnostic reasoning per failure
+2. OVS Flow Configuration with Automated Debug - SSH timeout diagnosis and fix
+3. Patroni HA Stack Construction from Zero Knowledge - self-educated via librarian
+
+Section 1.6 - Technical Challenges:
+1. Model Tier Optimization (Haiku/Sonnet/Opus routing, 60% cost savings)
+2. Token Window Ceiling (200K limit, wave-based decomposition)
+3. Context Loss Between Sessions (notepad persistence mitigation)
+4. Physical Infrastructure Bottlenecks (3 blocking decisions KP-02/03/05)
+
+### Verification:
+- Case study updated: ✓
+- Slides created: ✓
+- Evidence references git commits: ✓
+- Commit message: [doc] case-study: add challenges & AI-augmented work sections

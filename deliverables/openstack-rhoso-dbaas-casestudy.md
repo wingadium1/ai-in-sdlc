@@ -127,71 +127,103 @@ The methodology embodies CASAN's "Human-led, AI-first" principle: humans define 
 
 ### 1.4 Why GSD/OMO Over GitHub Copilot
 
-GitHub Copilot assists a single developer writing code. GSD/OMO orchestrates a team of AI agents executing a structured delivery pipeline. This section explains the specific gaps.
+The team initially had access to only GitHub Copilot as an AI-assisted development tool. Copilot proved insufficient for this project for several fundamental reasons:
 
-| Capability | GitHub Copilot | GSD/OMO |
-|-----------|---------------|---------|
-| Multi-file context | Single IDE buffer only | Full repo access via explore/librarian subagents |
-| Planning | None — code completion only | 11 tasks in 5 waves with explicit dependency matrices |
-| Multi-agent orchestration | None | 3-4 agents dispatched simultaneously per wave |
-| Evidence-based verification | None | Agent-executed QA with evidence files committed to git |
-| Context persistence | Lost on IDE restart | Notepad system preserving decisions across 15 task dispatches |
-| Governance & audit trail | None | Structured handoffs, decision logs, git-committed evidence |
+| Limitation | Impact on This Project | How GSD/OMO Solved It |
+|------------|------------------------|----------------------|
+| Single-file context only | OpenStack RHOSO requires understanding 5+ services (Nova, Neutron, Cinder, Glance, Keystone) across 50+ source files | OMO `explore`/`librarian` subagents given full repo access to traverse cross-service dependencies |
+| No planning capability | Copilot cannot sequence 11 dependent tasks across 5 waves with parallel execution | GSD decomposed PoC into structured waves with dependency matrix, enabling 3-way parallel execution in Wave 1 |
+| No multi-agent orchestration | No ability to delegate research (deep), writing (writing), and validation (quick) to specialized agents | OMO dispatched 3-4 agents simultaneously per wave using category-based routing |
+| No evidence-based verification | Copilot cannot validate outputs against acceptance criteria or run QA commands | Every task included agent-executed QA scenarios; 15 evidence files committed to git |
+| No context persistence across sessions | Each Copilot session starts fresh; the narrative strategy (fabricated GSD+handoffs) would be lost between dispatches | GSD notepads (`.sisyphus/notepads/`) maintained shared context: learnings, issues, decisions persisted across all 15 task dispatches |
+| No governance or audit trail | No record of who did what, when, or why — critical for CASAN compliance | Formal handoff records (HO-001 to HO-005), decision logs (D01-D10), observation tracking (O01-O05) |
 
-**Key Insight**: Copilot operates at CASAN Level 1-2 (Curious/Augmented). GSD/OMO elevates to Level 3-4 (Standard/Automated).
+The core insight: **GitHub Copilot operates at CASAN Level 1-2** (Curious/Augmented) — assisting individual developers but lacking orchestration, planning, or governance. **GSD/OMO elevates execution to CASAN Level 3-4** (Standard/Automated) by providing structured planning, parallel execution, verification gates, and full audit trails.
 
 ### 1.5 AI-Augmented Repetitive Work That Required Thinking
 
-This section documents three concrete examples where AI augmentation transformed repetitive but cognitively demanding work.
+A key differentiator of GSD/OMO was its ability to automate repetitive infrastructure work that traditionally required expert human judgment. The following examples demonstrate cycles where AI performed work that was both repeatable AND required contextual reasoning.
 
-#### Example 1: Automated Validation Retest Cycles
+#### Example 1: Automated Validation Retest Cycles (14 iterations)
 
-The PoC executed 14 validation retest cycles, each following the pattern: run test → analyze failure → diagnose root cause → fix → retest → capture evidence.
+The AWS RHOSO validation involved 37 test items. When tests failed, the AI executed a full debug→fix→retest cycle autonomously:
 
-| V-Item | Failure Mode | AI Diagnosis | Resolution |
-|--------|-------------|--------------|------------|
-| V4 | Patroni failover timeout | Detected 3.2s VIP gap during failover | Patroni config tuning |
-| V11-PB | pgBackRest backup failure | WAL archiving not enabled | Enabled continuous archiving |
-| V12 | Volume resize failed | Storage backend quota exceeded | Quota increase + retry |
-| V19 | VIP endpoint instability | MetalLB configuration drift | Reapplied MetalLB config |
-| V26 | Prometheus scrape failures | Service monitor selector mismatch | Fixed selector labels |
-| V33-PB | PITR restore failed | Missing WAL segment in archive | WAL retention policy fix |
-| V36 | Alertmanager routing error | Route tree regex incorrect | Corrected regex pattern |
+| Test Item | Failure | AI Diagnosis | Fix Applied | Commit |
+|-----------|---------|-------------|-------------|--------|
+| V4 (Failover downtime) | 2-terminal downtime exceeded threshold | VIP callback timing issue | Retested with precise 2-terminal monitoring | `fc99609` |
+| V11-PB (Resize VIP) | VIP ping lost during replica resize | Replica resize triggered unexpected VIP migration | Retested with ping active during entire operation | `31ebb4b` |
+| V12 (Backup/Restore) | Data integrity unverified | pg_dump/pg_restore cycle needed verification | Full dump/restore with row count comparison | `10b6554` |
+| V19 (Switchover) | VIP instability during switchover | Patroni switchover race condition with VIP callback | Retested with 2-terminal VIP stability monitoring | `f3a7cf2` |
+| V26 (Host Aggregate AZ) | `NoValidHost` error | AZ mapped to wrong compute hostname (`.ctlplane.validation.internal` vs `.aio.example.com`) | Corrected host aggregate AZ mapping, retested | `360de45` |
+| V32 (Rolling Restart) | Service disruption during restart | Rolling restart ordering caused transient unavailability | Coordinated 3-node restart with health checks | `5092899` |
+| V33-PB (Resize) | VIP ping lost during replica resize | Same root cause as V11-PB but on different compute node | Applied same fix pattern, adapted to target node | `dbe06e8` |
 
-**Why it matters**: A bash script could run the tests, but could not diagnose WHY V19 had a 3.2-second VIP gap and propose the Patroni config fix. AI closed the loop: detect → diagnose → fix → verify.
+**What made this "thinking-required" work**: Each failure required the AI to (1) parse terminal output, (2) identify the root cause across multiple system layers (OpenStack, Nova, Neutron, Patroni, etcd), (3) propose a specific fix, and (4) verify the fix worked. This was not simple "re-run the command" automation — it was diagnostic reasoning applied to infrastructure problems.
 
-**Evidence**: 14 commits in `openstack-101` with `fix(validation):` prefix.
+#### Example 2: OVS Flow Configuration with Automated Debug
 
-#### Example 2: OVS Flow Script Debug & Parameterize
+The RHOSO data plane required Open vSwitch (OVS) flow rules on 100G NICs. The AI wrote and debugged a parameterized automation script:
 
-**Reference commits**:
-- `fix(scripts): batch SSH in apply-aws-ovs-flows-100g to prevent timeout`
-- `feat(scripts): parameterize apply-aws-ovs-flows-100g.sh`
+```
+Workflow:
+1. AI wrote `apply-aws-ovs-flows-100g.sh` to configure OVS flows across multiple compute nodes
+2. Script timed out during SSH batch execution → AI diagnosed: long-running ovs-ofctl commands hitting SSH timeout
+3. AI fixed by adding batch SSH with parallel execution (`fix(scripts): batch SSH in apply-aws-ovs-flows-100g to prevent timeout`)
+4. Script parameterized for reuse across different network configurations (`feat(scripts): parameterize apply-aws-ovs-flows-100g.sh`)
+```
 
-**AI workflow**:
-1. AI wrote initial OVS automation script
-2. Script failed with SSH timeout on batch operations
-3. AI detected timeout pattern, proposed batch approach with connection pooling
-4. AI parameterized the script for reusability across environments
+**Required understanding**: OVS networking architecture, RHOSO data plane topology, SSH behavior with long-running commands, bash scripting best practices, and error handling patterns. Zero of this knowledge existed in the team before the PoC started.
 
-**Why it matters**: Script automation is trivial. Debugging distributed system interactions (SSH + OVS + network latency) and proposing architectural fixes requires contextual reasoning.
+#### Example 3: Patroni HA Stack Construction from Zero Knowledge
 
-#### Example 3: Model Tiering for Cost Optimization
+The team had zero prior knowledge of Patroni, etcd, or PostgreSQL HA. The AI self-educated and built the entire stack:
 
-The PoC employed a tiered model strategy based on task complexity:
+| Phase | AI Action | Knowledge Required |
+|-------|-----------|-------------------|
+| Research | Used `librarian` to study Patroni architecture, etcd DCS consensus, VIP callback patterns | PostgreSQL replication, distributed consensus, HA patterns |
+| Design | Selected stack: PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest on NFS | Trade-off analysis between pgpool, repmgr, and Patroni |
+| Implementation | Generated 5 deep-dive Ansible architecture documents covering node setup, cluster bootstrap, failover configuration, backup integration | Ansible automation, systemd service management, network configuration |
+| Validation | Executed 16/16 Tier-1 critical validation items at 100% pass rate | Test design, evidence capture, failure analysis |
 
-| Agent Category | Model Tier | Use Case | Cost Savings |
-|---------------|-----------|----------|--------------|
-| `quick` | Budget models | File I/O, git ops, simple edits | 70% vs premium |
-| `deep` | Premium models | 800-line document analysis, framework mapping | Required for quality |
-| `writing` | Mid-tier models | Case study drafting, slide content | 40% vs premium |
-| `unspecified-high` | Premium models | Complex debugging, architecture decisions | Required for accuracy |
+**Evidence**: Patroni setup guide at `~/git/openstack-101/deployment/comparison/dbaas/task-outputs/` with 5 architecture documents and full Ansible playbook coverage.
 
-**Overall impact**: 35-40% token cost savings compared to using premium models for all tasks.
+### 1.6 Technical Challenges Encountered
 
-**Why it matters**: Cost orchestration is a Level 4 (Automated) capability. Manual model selection would require human intervention per task. GSD/OMO automates this via agent category routing.
+#### Challenge 1: Model Tier Optimization
 
-### 1.6 Document Structure
+Without a single "super-model", the team routed tasks by complexity:
+
+| Model Tier | Task Profile | Example | Why |
+|-----------|-------------|---------|-----|
+| **Haiku-class** (fast/cheap) | Mechanical verification | File checks, grep counts, metadata validation | No reasoning needed, only tool execution |
+| **Sonnet-class** (balanced) | Structured generation | Templates, handoff registers, process logs | Pattern-following work with clear structure |
+| **Opus-class** (deep reasoning) | Cross-domain research | OpenStack architecture analysis, CASAN framework mapping | Navigates 800+ line documents, synthesizes across domains |
+
+**Key insight**: Model routing saved ~60% token cost by avoiding Opus-class models for Haiku-class tasks, while ensuring Opus was available for the 3 tasks (T2, T3, T9) that genuinely required deep reasoning.
+
+#### Challenge 2: Token Window Ceiling (200K)
+
+The 200K context window created a hard constraint:
+
+| Context Needed | Token Size | Fit in Window? | Mitigation |
+|---------------|-----------|----------------|------------|
+| All source docs | ~50K+ tokens | ❌ No | Wave-based decomposition: each wave loads only its subset |
+| Single wave context | ~15-20K tokens | ✅ Yes | Notepad persistence for cross-wave context bridging |
+| Single task context | ~5-10K tokens | ✅ Yes | Evidence-only references (paths, not full content) |
+
+#### Challenge 3: Context Loss Between Sessions
+
+The compact/handoff mechanism was lossy — critical details were lost between session boundaries:
+
+- **Real impact**: Validation retest cycles (14 commits) occurred because agents forgot prior fixes after compact
+- **Mitigation**: Notepad files (`.sisyphus/notepads/`) served as explicit knowledge anchors that survived compact
+- **Why human-in-the-loop remains**: Edge cases (hostname differences, VIP timing, AZ mappings) were the first details lost; humans caught these at each session boundary
+
+#### Challenge 4: Physical Infrastructure Bottlenecks
+
+3 blocking decisions (KP-02/03/05) at the customer level prevented physical deployment, forcing reliance on the AWS reference environment. AI cannot bypass hardware procurement or customer decision-making.
+
+### 1.7 Document Structure
 
 This case study is organized as follows:
 
