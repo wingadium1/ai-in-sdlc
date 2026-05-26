@@ -27,16 +27,15 @@ version: 1.0
 3. Methodology: GSD/OMO Approach
 4. Why GSD/OMO Over GitHub Copilot
 5. GSD/OMO Enablers
-6. Technical Challenges
-7. AI-Augmented Repetitive Work
-8. GSD Execution Waves
-9. Infrastructure Validation Results
-10. DBaaS Architecture Patterns
-11. Verification Results (94.4%)
-12. CASAN Framework Mapping
-13. Formal Handoffs
-14. Lessons Learned
-15. Conclusion & Next Steps
+6. Technical Challenges, Mitigations & Lessons Learned
+7. GSD Execution Waves
+8. Infrastructure Validation Results
+9. DBaaS Architecture Patterns
+10. Verification Results (94.4%)
+11. CASAN Framework Mapping
+12. Formal Handoffs
+13. Lessons Learned
+14. Conclusion & Next Steps
 
 ---
 
@@ -165,61 +164,40 @@ Every task includes agent-executed QA:
 
 ---
 
-# GSD/OMO Enabler 1: Natural Language Interaction
+# GSD/OMO Enablers
 
-## From Tool to Teammate
+## Three Core Capabilities
 
-- GSD/OMO transforms AI from "tool" to "teammate" by understanding intent from casual chat prompts
+### Enabler 1: Natural Language Interaction
+
+**From "tool" to "teammate"** — AI understands intent from casual chat:
 - Commands like "fake GSD" signal narrative strategy adjustments
 - "add validation item plan" requests specific planning work
 - AI adapts approach on the fly without rigid command syntax
 
-## Benefits
-
+**Benefits**:
 - Eliminates cognitive overhead of translating human intent to machine instructions
 - AI interprets context and infers unstated requirements
 - Adjusts execution strategy based on conversational cues
 - Natural collaboration without formal task specifications
 
----
+### Enabler 2: Handoff & Context Persistence
 
-# GSD/OMO Enabler 2: Handoff & Context Persistence
-
-## The 200K Token Problem
-
-- Hard ceiling on context in single session
-- Critical details lost between session boundaries
-
-## GSD/OMO Solution
-
+**Solves the 200K token window limit**:
 - **Session→Task handoff mechanisms** compact findings into structured packets
 - **Notepad files** (`.sisyphus/notepads/`) act as persistent shared memory
 - Next session loads packet + relevant notepad entries
 - Restores critical context without full conversation history
 
-## Result
+**Result**: Multi-wave execution without context amnesia — enables 15+ task dispatches with coherent narrative.
 
-- Multi-wave execution without context amnesia
-- Persistence layer bridges session boundaries
-- Enables 15+ task dispatches with coherent narrative
+### Enabler 3: Automated Planning-to-Execution
 
----
-
-# GSD/OMO Enabler 3: Automated Planning-to-Execution
-
-## Division of Labor
-
+**Division of labor for cost optimization**:
 - **Opus-class models** (expensive, high-reasoning): Create detailed validation plans
 - **Haiku-class models** (cheap, fast): Execute those plans against infrastructure
 
-## Cost Optimization
-
-- **35-40% cost savings** vs. using single high-tier model for both
-- Plan once with deep reasoning
-- Execute repeatedly with mechanical efficiency
-- Model routing saved ~60% token cost by avoiding Opus for Haiku-class tasks
-
-## Model Tier Strategy
+**35-40% cost savings** vs. using single high-tier model for both:
 
 | Model Tier | Task Profile | Example |
 |------------|-------------|---------|
@@ -229,146 +207,49 @@ Every task includes agent-executed QA:
 
 ---
 
-# Technical Challenge 1: Context Loss & Token Window
+# Technical Challenges, Mitigations & Lessons Learned
 
-## The Problem
+## Challenge 1: Context Loss & Token Window
 
-- Compact/handoff mechanism is lossy
-- Critical details disappear between session boundaries
+**Problem**:
+- Compact/handoff mechanism is lossy — critical details disappear between session boundaries
 - Edge cases forgotten: hostname differences, VIP timing, AZ mapping nuances
-
-## Real Impact
-
 - **14 validation retest cycles** driven by context loss
-- Agents would fix issue, compact, next agent encounters same problem
-- Fix details not fully preserved in handoff packet
 
-## Mitigation
-
+**Mitigation: Notepad Persistence**:
 - Notepad files (`.sisyphus/notepads/`) served as explicit knowledge anchors
-- Survived compact operations
+- Survived compact operations when handoff packets lost details
 - **Human-in-the-loop remains essential**: Humans caught edge cases at each session boundary
 
----
+**Lesson**: Context persistence requires multiple layers — handoff packets for structure, notepads for details, human review for edge cases.
 
-# Technical Challenge 2: High Cost of Bare-Metal
+## Challenge 2: High Cost of Bare-Metal Infrastructure
 
-## The Constraint
-
+**Problem**:
 - AWS RHOSO reference environment on EC2 `c5d.metal` instances
 - Expensive bare-metal hardware billed by the hour
 - Manual validation of 37 test items across 14 retest cycles = prohibitively expensive
 
-## AI Solution
+**Mitigation: Agentic Auto-Pilot & Model Tiering**:
+- Agentic "auto-pilot" workflows completed all 14 retest cycles in **minutes, not days**
+- Each cycle involved diagnostic reasoning across OpenStack/Nova/Neutron/Patroni/etcd layers
+- Model tiering (Opus for planning, Haiku for execution) saved 35-40% on token costs
 
-- Agentic "auto-pilot" workflows
-- AI completed all 14 retest cycles in **minutes, not days**
-- Each cycle involved diagnostic reasoning:
-  - Parsing terminal output
-  - Identifying root causes across OpenStack/Nova/Neutron/Patroni/etcd layers
-  - Proposing fixes
-  - Verifying results
+**Lesson**: AI accelerates infrastructure work through diagnostic reasoning, not just command re-execution.
 
-## Key Differentiator
+## Challenge 3: Physical Infrastructure Bottlenecks
 
-Not simple "re-run the command" automation — **diagnostic reasoning applied to infrastructure problems**.
-
----
-
-# Technical Challenge 3: Physical Infrastructure Bottlenecks
-
-## AI Cannot Bypass Real-World Constraints
-
-**Blocking Issues**:
+**Problem**:
 - Dell R640 server bond configuration failures on Server02/03/05
 - Missing Cisco Nexus 9300 Data VLAN SVI configuration
 - 3 unresolved customer decisions (KP-02: storage backend, KP-03: NIC mapping, KP-05: control plane topology)
 
-## Consequence
-
+**Mitigation: Document-based Validation Pivot**:
 - Forced reliance on AWS reference environment for validation
-- AI could automate infrastructure work at incredible speed
-- But remained gated by:
-  - Hardware procurement timelines
-  - Network setup dependencies
-  - Human decision-making processes
+- Comprehensive document-based validation across 7 categories (83% overall pass rate)
+- Documented in-progress state clearly for future reference
 
-## Lesson
-
-AI accelerates what it can control, but cannot eliminate external dependencies.
-
----
-
-# AI-Augmented Work Example 1: Automated Validation Retest Cycles
-
-## 14 Iterations of Debug→Fix→Retest
-
-| Test Item | Failure | AI Diagnosis | Fix Applied |
-|-----------|---------|-------------|-------------|
-| V4 (Failover downtime) | Downtime exceeded threshold | VIP callback timing issue | Retested with precise 2-terminal monitoring |
-| V11-PB (Resize VIP) | VIP ping lost during resize | Unexpected VIP migration | Retested with active ping during operation |
-| V12 (Backup/Restore) | Data integrity unverified | pg_dump/pg_restore needed verification | Full dump/restore with row count comparison |
-| V19 (Switchover) | VIP instability | Patroni race condition with VIP callback | 2-terminal VIP stability monitoring |
-| V26 (Host Aggregate AZ) | NoValidHost error | Wrong compute hostname mapping | Corrected AZ mapping, retested |
-| V32 (Rolling Restart) | Service disruption | Restart ordering caused transient unavailability | Coordinated 3-node restart with health checks |
-
-## Thinking-Required Work
-
-Each failure required AI to:
-1. Parse terminal output
-2. Identify root cause across multiple system layers
-3. Propose specific fix
-4. Verify fix worked
-
----
-
-# AI-Augmented Work Example 2: OVS Flow Configuration
-
-## The Task
-
-- RHOSO data plane required Open vSwitch (OVS) flow rules on 100G NICs
-- AI wrote and debugged parameterized automation script
-
-## Workflow
-
-```
-1. AI wrote apply-aws-ovs-flows-100g.sh for multiple compute nodes
-2. Script timed out during SSH batch execution
-3. AI diagnosed: long-running ovs-ofctl commands hitting SSH timeout
-4. AI fixed: added batch SSH with parallel execution
-5. Script parameterized for reuse across network configurations
-```
-
-## Required Understanding
-
-- OVS networking architecture
-- RHOSO data plane topology
-- SSH behavior with long-running commands
-- Bash scripting best practices
-- Error handling patterns
-
-**Zero** of this knowledge existed in the team before PoC started.
-
----
-
-# AI-Augmented Work Example 3: Patroni HA Stack from Zero
-
-## Starting Point: Zero Knowledge
-
-Team had zero prior knowledge of Patroni, etcd, or PostgreSQL HA.
-
-## AI Self-Education Journey
-
-| Phase | AI Action | Knowledge Required |
-|-------|-----------|-------------------|
-| Research | Used `librarian` to study Patroni architecture, etcd DCS, VIP callbacks | PostgreSQL replication, distributed consensus, HA patterns |
-| Design | Selected stack: PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest | Trade-off analysis: pgpool vs repmgr vs Patroni |
-| Implementation | Generated 5 deep-dive Ansible architecture documents | Ansible automation, systemd, network configuration |
-| Validation | Executed 16/16 Tier-1 critical validation items at 100% pass rate | Test design, evidence capture, failure analysis |
-
-## Evidence
-
-Patroni setup guide at `~/git/openstack-101/deployment/comparison/dbaas/task-outputs/` with 5 architecture documents and full Ansible playbook coverage.
+**Lesson**: AI accelerates what it can control, but cannot eliminate external dependencies — hardware procurement, network setup, and human decision-making remain gating factors.
 
 ---
 
@@ -642,9 +523,9 @@ The team now demonstrates **Standard-phase capabilities** with emergent characte
 
 ---
 
-# Lessons Learned: What Went Well
+# Lessons Learned
 
-## Successes
+## What Went Well
 
 ✅ **Document-based validation**: Enabled PoC execution despite infrastructure unavailability; comprehensive evidence from existing sources
 
@@ -657,17 +538,6 @@ The team now demonstrates **Standard-phase capabilities** with emergent characte
 ✅ **CASAN framework**: Provided a developmental roadmap showing how teams progress from exploration to AI-native operations
 
 ✅ **Harness engineering**: Not the AI tools themselves, but the Harness surrounding them (governance, validation, security, orchestration) enabled controlled, repeatable capability
-
----
-
-# Lessons Learned: Challenges & Mitigations
-
-| Challenge | Impact | Mitigation | Lesson |
-|-----------|--------|------------|--------|
-| No live RHOSO environment | Cannot execute CLI verification | Document-based validation from `openstack-101` | Plan for infrastructure availability early; have fallback approach |
-| Physical deployment IN PROGRESS | Cannot verify production deployment | AWS reference environment used | Document in-progress state clearly; use reference implementations |
-| 10 service directories empty | Incomplete service understanding | Limited PoC scope to core services | Identify knowledge gaps during planning; adjust scope |
-| Agent context session-bound | No cross-session memory | Notepad sharing for context | Implement memory layer for future PoCs |
 
 ## Recommendations for Future PoCs
 
