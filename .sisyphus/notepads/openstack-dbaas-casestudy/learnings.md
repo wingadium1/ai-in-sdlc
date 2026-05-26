@@ -46,3 +46,29 @@
 ### File Created
 - docs/research/casan-mapping-rubric.md (468 lines, comprehensive reference mapping)
 - .sisyphus/evidence/task-3-casan-rubric.txt
+
+## Task 2 Learnings (2026-05-26)
+
+### OpenStack Research
+- OpenStack is a microservices-based IaaS platform with core services: Nova, Neutron, Keystone, Glance, Cinder
+- All services authenticate through Keystone and communicate via REST APIs + AMQP message bus
+- OpenStack deployment models range from manual installation to containerized (RHOSO)
+
+### RHOSO Research
+- RHOSO runs OpenStack control plane as containers on OpenShift, managed by Operators
+- Data plane (compute nodes) runs on external RHEL nodes managed by Ansible
+- Key CRDs: OpenStackControlPlane, OpenStackDataPlaneNodeSet, OpenStackDataPlaneDeployment
+- CLI access is via `oc rsh -n openstack openstackclient` then standard `openstack` commands
+- Two topologies: compact (shared nodes) and dedicated nodes (separate nodes)
+
+### DBaaS Research
+- Trove is OpenStack's native DBaaS with components: trove-api, trove-taskmanager, trove-conductor, trove-guestagent
+- Trove supports MySQL, MariaDB, PostgreSQL, Redis, MongoDB, Cassandra
+- Alternatives: cloud-native operators (CrunchyData, Percona, CloudNativePG) running on Kubernetes
+- For PoC scope, Trove is the most relevant path for OpenStack-native DBaaS
+
+### Document Creation
+- Comprehensive baseline doc created: docs/research/openstack-rhoso-baseline.md
+- Word count: 4256 (well above 2000 minimum)
+- Includes architecture diagrams (ASCII), CLI commands, glossary, and deployment workflow
+
