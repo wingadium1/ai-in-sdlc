@@ -1,13 +1,13 @@
 ---
 title: "OpenStack RHOSO DBaaS Proof of Concept"
-subtitle: "A CASAN-Aligned Technical Case Study"
+subtitle: "A Retrospective CASAN Analysis of the GSD/OMO PoC"
 date: 2026-05-26
 version: 1.0
 ---
 
 # OpenStack RHOSO DBaaS Proof of Concept
 
-## A CASAN-Aligned Technical Case Study
+## A Retrospective CASAN Analysis of the GSD/OMO PoC
 
 **Document Code**: AI-SDLC-POC-001  
 **Effective Date**: 2026-05-26  
@@ -16,7 +16,7 @@ version: 1.0
 
 **Authors**: FPT AI-in-SDLC Team  
 **Organization**: FPT  
-**CASAN Journey Position**: Standard phase — demonstrating governed, repeatable AI-assisted SDLC practices
+**Retrospective CASAN Assessment**: Standard phase — a post-PoC analysis revealed the GSD/OMO process naturally achieved governed, repeatable AI-assisted SDLC practices
 
 ---
 
@@ -32,7 +32,7 @@ version: 1.0
 8. Infrastructure Validation Results
 9. DBaaS Architecture Patterns
 10. Verification Results (94.4%)
-11. CASAN Framework Mapping
+11. Retrospective CASAN Framework Mapping
 12. Formal Handoffs
 13. Lessons Learned
 14. Conclusion & Next Steps
@@ -46,7 +46,7 @@ version: 1.0
 - **Primary Objective**: Verified the feasibility of building a production-ready DBaaS (starting with PostgreSQL) on the OpenStack RHOSO platform
 - **94.4% validation pass rate** (34/36 items) across all DBaaS lifecycle domains
 - HA failover, backup/restore, scaling operations, and monitoring integration validated
-- **CASAN Journey**: Demonstrated capabilities aligned with the Standard phase, with emergent characteristics of the Automated phase
+- **Retrospective CASAN Analysis**: A post-PoC analysis using the CASAN framework revealed the team's workflow naturally aligned with the Standard phase, with emergent characteristics of the Automated phase
 - Repeatable, governable AI-assisted SDLC framework for enterprise cloud infrastructure
 
 ## Key Findings
@@ -72,13 +72,13 @@ version: 1.0
 **Primary**:
 - Validate RHOSO architecture readiness for DBaaS deployment
 - Establish OpenStack/RHOSO/DBaaS knowledge baseline for team with zero domain expertise
-- Map PoC execution to the CASAN developmental journey
+- Retrospectively analyze the completed PoC execution through the lens of the CASAN framework
 - Execute structured workflow with formal handoffs and evidence collection
 
 **Secondary**:
 - Create reusable templates and agent patterns
 - Establish audit trail through git-committed evidence files
-- Validate progression along the CASAN journey to the Standard phase
+- Validate through retrospective analysis that the executed workflow achieved Standard-phase maturity
 
 ---
 
@@ -92,7 +92,7 @@ This PoC employed the GSD (Goal-Strategy-Do) methodology with OMO (OhMyOpenCode)
 - **Specialized Agents**: `quick`, `deep`, `writing`, and `unspecified-high` agents matched to task complexity
 - **Formal Handoffs**: 6 handoff records (HO-001 to HO-005) with clear accountability transfer
 - **Evidence Trail**: 15 evidence files committed to git, decision logs (D01-D10), and phase packets
-- **CASAN Mapping**: Continuous assessment of team progression along the 5-stage CASAN journey
+- **Retrospective CASAN Analysis**: After PoC completion, the workflow was mapped to the 5-stage CASAN journey to assess the maturity of the process that emerged
 
 ## Why This Matters
 
@@ -135,7 +135,7 @@ Solves the 200K token problem:
 ### 3. Model Tier Optimization
 
 Division of labor for cost efficiency:
-- **Opus-class** (deep reasoning): Architecture research, CASAN mapping, cross-domain analysis
+- **Opus-class** (deep reasoning): Architecture research, retrospective CASAN framework mapping, cross-domain analysis
 - **Sonnet-class** (balanced): Template generation, handoff registers, process logs
 - **Haiku-class** (fast/cheap): Mechanical verification, file checks, grep counts
 - **Result**: 35-40% cost savings vs. single high-tier model for all tasks
@@ -147,7 +147,7 @@ Every task includes agent-executed QA:
 - Diagnostic reasoning across OpenStack/Nova/Neutron/Patroni/etcd layers
 - 14 retest cycles completed in minutes, not days
 
-## CASAN Journey Positioning
+## Retrospective CASAN Positioning
 
 | Approach | CASAN Stage | Characteristics |
 |----------|-------------|-----------------|
@@ -160,7 +160,7 @@ Every task includes agent-executed QA:
 
 **GitHub Copilot, manual scripts, and CI/CD pipelines represent early stages of the CASAN journey** — assisting individual developers but lacking orchestration, planning, or governance.
 
-**GSD/OMO advances teams along the path to Standard and Automated stages** with structured planning, parallel execution, verification gates, and full audit trails — enabling complex, multi-step work that would be impossible with individual tools alone.
+**Retrospective analysis revealed that GSD/OMO innately produces outcomes aligned with the Standard and Automated stages** — structured planning, parallel execution, verification gates, and full audit trails emerged organically from the methodology, even without prior knowledge of the CASAN framework. This suggests the framework describes a natural maturity progression that GSD/OMO accelerates.
 
 ---
 
@@ -203,7 +203,7 @@ Every task includes agent-executed QA:
 |------------|-------------|---------|
 | Haiku-class (fast/cheap) | Mechanical verification | File checks, grep counts, metadata validation |
 | Sonnet-class (balanced) | Structured generation | Templates, handoff registers, process logs |
-| Opus-class (deep reasoning) | Cross-domain research | OpenStack architecture, CASAN framework mapping |
+| Opus-class (deep reasoning) | Cross-domain research | OpenStack architecture, retrospective CASAN framework mapping |
 
 ---
 
@@ -257,7 +257,7 @@ Every task includes agent-executed QA:
 
 ## Objective
 
-Establish infrastructure validation, knowledge baseline, and understanding of the CASAN developmental journey.
+Establish infrastructure validation, knowledge baseline, and foundational understanding for the later retrospective CASAN analysis.
 
 ## Activities
 
@@ -269,9 +269,9 @@ Establish infrastructure validation, knowledge baseline, and understanding of th
 - Researched OpenStack architecture, RHOSO deployment model, DBaaS options
 - Produced 4,256-word baseline document
 
-**T3 — CASAN Journey Mapping** (deep):
+**T3 — CASAN Framework Research** (deep):
 - Deep analysis of the 5 CASAN stages as a developmental path, 4 thinking layers, Harness Engineering
-- Produced 468-line journey mapping rubric
+- Produced 468-line framework reference rubric for later retrospective application
 
 ## Evidence
 
@@ -321,9 +321,9 @@ Template structure established; environment state documented as reference.
 - Documented DBaaS lifecycle tests from existing evidence
 - **34/36 tests passed (94.4%)**
 
-**T9 — Mapping the PoC to the CASAN Journey** (deep):
-- Mapped PoC execution to the CASAN developmental path
-- Assessed as demonstrating Standard-phase capabilities with emergent Automated-phase characteristics
+**T9 — Retrospective CASAN Mapping** (deep):
+- Applied the CASAN framework retrospectively to the completed PoC execution
+- Discovered the workflow naturally demonstrated Standard-phase capabilities with emergent Automated-phase characteristics
 
 **T10 — Handoff Artifact Compilation** (writing):
 - Created formal handoff register with 6 handoff records
@@ -434,15 +434,15 @@ Template structure established; environment state documented as reference.
 | Tier 1/MUST items | 100% | 100% (16/16) | ✅ Yes |
 | Documentation completeness | All sections | 11/11 sections | ✅ Yes |
 | Evidence trail | Per task | 10 evidence files | ✅ Yes |
-| CASAN Standard phase | Yes | Standard-phase capabilities demonstrated | ✅ Yes |
+| Retrospective CASAN Standard-phase assessment | Yes | Standard-phase capabilities discovered post-hoc | ✅ Yes |
 
 ---
 
-# Mapping the PoC to the CASAN Journey
+# Retrospective Analysis: Mapping the GSD/OMO Process to the CASAN Journey
 
-## The CASAN Journey: Five Stages of Evolution
+## The CASAN Framework: Five Stages of Evolution
 
-The CASAN framework describes an evolutionary path — not a fixed ruler, but a developmental journey where teams progress from initial curiosity to AI-native operations. Each stage represents a qualitative shift in how humans and AI collaborate.
+The CASAN framework describes an evolutionary path — not a fixed ruler, but a developmental journey where teams progress from initial curiosity to AI-native operations. Each stage represents a qualitative shift in how humans and AI collaborate. **Importantly, this framework was applied retrospectively**: after the PoC was fully executed, the completed workflow was analyzed through the CASAN lens to assess the maturity of the process that had naturally emerged.
 
 | Stage | Name | Description |
 |-------|------|-------------|
@@ -452,7 +452,7 @@ The CASAN framework describes an evolutionary path — not a fixed ruler, but a 
 | 4 | Automated | AI agents operate workflows with minimal human intervention |
 | 5 | Native | AI becomes the core operating system of the engineering organization |
 
-## PoC Activity Classification
+## PoC Activity Classification (Retrospective)
 
 | PoC Activity | CASAN Stage | Delegation Level | Rationale |
 |--------------|-------------|------------------|-----------|
@@ -462,16 +462,16 @@ The CASAN framework describes an evolutionary path — not a fixed ruler, but a 
 | DBaaS verification (T8) | Standard–Automated | L3–L4 | Agent-operated workflow with control barriers |
 | Handoff compilation (T10) | Standard | L3 (Execute bounded) | Formal governance artifact creation |
 
-## PoC Assessment: A Developmental Transition
+## PoC Assessment: A Retrospective Discovery
 
-This PoC demonstrates how the team's capabilities **transitioned along the CASAN path** — from the Augmented stage (using basic AI tools for individual productivity) to the Standard stage (using a governed, structured process like GSD/OMO).
+Retrospective analysis of the completed PoC revealed that the team's workflow **naturally aligned with the CASAN path** — the GSD/OMO methodology produced outcomes characteristic of the Standard stage (and emergent Automated-stage traits) without the team consciously following a formal maturity model.
 
-**Key transitions observed**:
-- From ad-hoc AI usage to standardized wave-based execution
-- From individual productivity to multi-agent orchestration with formal handoffs
-- From ungoverned experimentation to decision logs, evidence trails, and audit-ready artifacts
+**Key findings from the retrospective mapping**:
+- The process evolved from ad-hoc AI usage to standardized wave-based execution
+- Individual productivity gave way to multi-agent orchestration with formal handoffs
+- Ungoverned experimentation was replaced by decision logs, evidence trails, and audit-ready artifacts
 
-The team now demonstrates **Standard-phase capabilities** with emergent characteristics of the Automated phase in agent-operated workflows and exception-based human review. The goal is not to "hit a number" but to continue progressing along this evolutionary path.
+The team demonstrated **Standard-phase capabilities** with emergent characteristics of the Automated phase in agent-operated workflows and exception-based human review. This was not a deliberate "climb" up a maturity ladder — it was the discovery that GSD/OMO innately produces high-maturity outcomes.
 
 ---
 
@@ -535,7 +535,7 @@ The team now demonstrates **Standard-phase capabilities** with emergent characte
 
 ✅ **Formal handoffs**: Created clear accountability and audit trail; no ambiguity in responsibility transfer
 
-✅ **CASAN framework**: Provided a developmental roadmap showing how teams progress from exploration to AI-native operations
+✅ **Retrospective CASAN analysis**: Provided a vocabulary and framework to recognize the high-maturity outcomes that GSD/OMO had naturally produced
 
 ✅ **Harness engineering**: Not the AI tools themselves, but the Harness surrounding them (governance, validation, security, orchestration) enabled controlled, repeatable capability
 
@@ -549,11 +549,11 @@ The team now demonstrates **Standard-phase capabilities** with emergent characte
 
 ---
 
-# Continuing the CASAN Journey
+# Continuing the Journey: From Retrospective Insight to Forward Progress
 
-## Current Position: Standard Phase
+## Retrospective Finding: Standard-Phase Maturity Discovered
 
-Through this PoC, the team has demonstrated capabilities aligned with the **Standard phase** of the CASAN journey:
+The post-PoC CASAN analysis revealed that the team had naturally achieved capabilities aligned with the **Standard phase**:
 
 - Formal AI governance established
 - Reusable agent templates created
@@ -561,7 +561,7 @@ Through this PoC, the team has demonstrated capabilities aligned with the **Stan
 - Structured data lineage in place
 - ISO 42001 readiness achieved
 
-This is not a destination — it is a waypoint on a continuous path of evolution.
+This was not a destination deliberately reached by following a maturity model — it was a discovery that the GSD/OMO methodology innately produces high-maturity outcomes. The CASAN framework provided the vocabulary to recognize what had already been built.
 
 ## Recommended Next Step: Advancing Toward the Automated Phase
 
@@ -588,14 +588,14 @@ The OpenStack RHOSO DBaaS Proof of Concept successfully verified the feasibility
 
 - **Technical Feasibility**: 94.4% validation pass rate (34/36 items) across all DBaaS lifecycle domains
 - **100% pass rate** on Tier 1/MUST critical items (16/16)
-- **Process Excellence**: Demonstrated Standard-phase capabilities on the CASAN journey with formal governance, reusable templates, dedicated roles
-- **Emergent Automated-phase characteristics**: Agent-operated workflows and exception-based human review
+- **Process Excellence**: Retrospective CASAN analysis revealed Standard-phase capabilities with formal governance, reusable templates, dedicated roles — maturity that emerged naturally from GSD/OMO
+- **Emergent Automated-phase characteristics**: Agent-operated workflows and exception-based human review discovered through post-hoc framework application
 
 ## Key Takeaways
 
 1. **Production-ready DBaaS is feasible on RHOSO**: The PoC confirmed that RHOSO's containerized control plane, Operator-based lifecycle management, and integration patterns can support a production DBaaS deployment
 2. **Document-based validation is viable**: Comprehensive evidence from existing sources when live infrastructure unavailable
-3. **Rapid progression along the CASAN journey is achievable**: With proper Harness engineering, teams can advance from the Curious stage to the Standard phase in a single PoC cycle
+3. **GSD/OMO innately produces high-maturity outcomes**: The retrospective CASAN analysis revealed that teams using GSD/OMO naturally achieve Standard-phase (and emergent Automated-phase) maturity, even without prior knowledge of a formal model like CASAN
 4. **Human-led, AI-first balance is critical**: Clear delegation architecture with humans defining scope, AI executing bounded tasks
 5. **Harness is the differentiator**: Governance, validation, security, orchestration enabled controlled, repeatable capability
 
@@ -619,11 +619,11 @@ The OpenStack RHOSO DBaaS Proof of Concept successfully verified the feasibility
 
 - Deploy policy enforcement engine for automated compliance
 - Build validation pipeline with golden datasets and LLM-as-judge
-- Advance toward the Automated phase of the CASAN journey with full AgentOps and orchestration
+- Advance toward the Automated phase with full AgentOps and orchestration, informed by the retrospective understanding of how GSD/OMO naturally drives maturity progression
 
 ## Final Recommendation
 
-**Proceed to production planning** with Pattern-2B (FPT Cloud managed service) and a 6-month timeline. Continue progressing along the CASAN journey toward the Automated phase with AgentOps and Multi-Agent orchestration investments.
+**Proceed to production planning** with Pattern-2B (FPT Cloud managed service) and a 6-month timeline. Leverage the retrospective insight that GSD/OMO naturally drives CASAN maturity progression, and invest in AgentOps and Multi-Agent orchestration to consciously advance toward the Automated phase.
 
 ---
 
