@@ -716,6 +716,380 @@ Timeout value configurable via environment variable SESSION_TIMEOUT_MINUTES.
 
 ---
 
+---
+
+## GSD → OMO Handoff Contract
+
+### 1.1 Purpose
+
+Defines how a GSD Redux `PLAN.md` task is transformed into an OMO/OpenCode `task()` invocation. This is the execution handoff from the planning layer (GSD) to the orchestration layer (OMO).
+
+**Source system**: GSD Redux (`.planning/`)  
+**Target system**: OMO/OpenCode (`.sisyphus/`)  
+**Adapter location**: `.sdlc/integration/adapters/gsd-omo-adapter.md`  
+**State channel**: GSD `STATE.md` ↔ OMO execution logs
+
+### 1.2 Source Format (GSD `PLAN.md` Task Schema)
+
+A GSD task is a markdown subsection under an execution wave, using the following fields:
+
+```markdown
+- [ ] N. Task Title
+
+  **What to do**:
+  - Description: <free-text task description>
+  - <additional sub-bullets for context>
+
+  **Must NOT do**:
+  - <guardrails and exclusions>
+
+  **Recommended Agent Profile**:
+  - **Category**: `<category>`
+    - Reason: <rationale>
+  - **Skills**: [`<skill1>`, `<skill2>`]
+
+  **Parallelization**:
+  - **Can Run In Parallel**: YES | NO
+  - **Parallel Group**: Wave <N> (with Tasks ...)
+  - **Blocks**: <downstream tasks>
+  - **Blocked By**: <upstream tasks>
+
+  **References**:
+  - `<file-path>` — <description>
+  - `<external-url>` — <description>
+
+  **Acceptance Criteria**:
+  - [ ] <criterion 1>
+  - [ ] <criterion 2>
+
+  **QA Scenarios**:
+  ```
+  Scenario: <name>
+    Tool: <tool>
+    Steps: <steps>
+    Expected Result: <result>
+    Evidence: <evidence-path>
+  ```
+
+  **Commit**: YES | NO
+  - Message: `[<prefix>] <summary>`
+  - Files: `<path1>`, `<path2>`
+```
+
+### 1.3 Target Format (OMO `task()` Signature)
+
+OMO exposes a single `task()` function for agent dispatch:
+
+```typescript
+task(
+  category: "deep" | "quick" | "writing" | "visual-engineering" | ...,
+  load_skills: string[],
+  description: string,      // 3-5 words, shown in UI/logs
+  prompt: string,           // full instructions for the agent
+  run_in_background: boolean
+)
+```
+
+### 1.4 Task Field Mapping
+
+| GSD Field (`PLAN.md`) | OMO Parameter | Mapping Rule | Required |
+|---|---|---|---|
+| Task Title (`N. Task Title`) | `description` | Truncate to 3–5 words; used as log label | Yes |
+| `Description` bullets | `prompt` | Concatenate all `**What to do**` bullets into a single prompt block. Prepend wave/group context for disambiguation. | Yes |
+| `Must NOT do` bullets | `prompt` (appended) | Append as a `### Guardrails` section inside the prompt. | No |
+| `Recommended Agent Profile → Category` | `category` | Map directly. Fallback: `"deep"` if missing or unrecognised. | Yes |
+| `Recommended Agent Profile → Skills` | `load_skills` | Pass as string array. Filter to skills known in the OMO registry; drop unknowns with a warning. | No |
+| `Parallelization → Can Run In Parallel` | `run_in_background` | `YES` → `true`; `NO` → `false`. | Yes |
+| `References → file-path` | `prompt` (appended) | Append as `### Context Files` with full paths. | No |
+| `References → external-url` | `prompt` (appended) | Append as `### External References` with URLs. | No |
+| `Acceptance Criteria` | `prompt` (appended) | Append as `### Acceptance Criteria` checklist. OMO agent verifies these before signalling completion. | No |
+| `QA Scenarios` | `prompt` (appended) | Append as `### QA Scenarios` in Gherkin-like blocks. Agent executes and captures evidence to the specified path. | No |
+| `Commit → Message` | `prompt` (appended) | Append as `### Commit Instruction` with expected prefix and summary. | No |
+| `Commit → Files` | `prompt` (appended) | Append as `### Expected Modified Files` list. | No |
+
+### 1.5 Category Mapping
+
+GSD agent profile categories map to OMO `category` values as follows:
+
+| GSD Category Hint | OMO `category` | Rationale |
+|---|---|---|
+| `deep`, architecture, design, analysis | `"deep"` | Long-horizon reasoning, high token budget |
+| `quick`, spike, validation, check | `"quick"` | Short-horizon, fast feedback |
+| `writing`, docs, spec, contract | `"writing"` | Narrative generation, low code |
+| `visual-engineering`, diagram, UI | `"visual-engineering"` | Diagram, chart, or UI generation |
+| `unspecified-high` | `"deep"` | Conservative default for unknown high-skill agents |
+| *(missing)* | `"deep"` | Safe fallback |
+
+### 1.6 Dependency & Wave Mapping
+
+GSD organises execution into **waves**. The adapter must respect wave boundaries when dispatching to OMO.
+
+#### Wave Dispatch Rules
+
+```
+Wave N (all tasks marked "Can Run In Parallel: YES")
+  ├── task_1  →  task(category=..., run_in_background=true)
+  ├── task_2  →  task(category=..., run_in_background=true)
+  └── task_3  →  task(category=..., run_in_background=true)
+       ↓
+   Wait for ALL background tasks in Wave N to complete
+       ↓
+Wave N+1 (sequential or next parallel group)
+  ├── task_4  →  task(category=..., run_in_background=false) OR
+  │               task(category=..., run_in_background=true) + explicit sync
+  └── ...
+```
+
+| GSD Dependency Semantics | OMO Behaviour |
+|---|---|
+| `Can Run In Parallel: YES` + same Wave | Dispatch with `run_in_background=true`. Collect results asynchronously. |
+| `Can Run In Parallel: NO` | Dispatch with `run_in_background=false`. Block until completion. |
+| `Blocked By: Task X` | Do not dispatch until Task X signals completion in `STATE.md`. |
+| `Blocks: Task Y` | After this task completes, update `STATE.md`; Task Y becomes eligible for dispatch. |
+| Cross-wave dependency | Adapter polls `STATE.md` for upstream task status. On `completed`, dispatches downstream. |
+
+#### Adapter Sequencing Algorithm
+
+1. **Parse** `PLAN.md` into a DAG of tasks with wave IDs and dependency edges.
+2. **Dispatch Wave 0**: All tasks with no `Blocked By` entries and `run_in_background=true`.
+3. **Poll loop**: Every 5 s, read `.planning/STATE.md` (or `boulder.json` task state).
+4. **Wave advancement**: When all tasks in wave `N` are `completed` (or `skipped`), dispatch all tasks in wave `N+1` whose `Blocked By` tasks are satisfied.
+5. **Failure handling**: If any task reports `failed`, halt wave advancement and surface to GSD replanning protocol.
+
+### 1.7 Prompt Assembly Template
+
+The adapter constructs the OMO `prompt` by concatenating GSD sections in a fixed order:
+
+```markdown
+## Task
+<task title>
+
+### Description
+<What to do bullets>
+
+### Guardrails
+<Must NOT do bullets>
+
+### Context Files
+<References file-path list>
+
+### External References
+<References external-url list>
+
+### Acceptance Criteria
+<checkbox list>
+
+### QA Scenarios
+<scenario blocks>
+
+### Commit Instruction
+Message: `[<prefix>] <summary>`
+Files: <path list>
+```
+
+### 1.8 State Feedback Protocol (OMO → GSD)
+
+When an OMO task finishes, the adapter writes a structured result back to GSD state.
+
+#### Feedback File
+
+**Location**: `.planning/STATE.md` (append) or `.planning/boulder.json` task entry update  
+**Format**: Markdown log entry per task (human-readable) + JSON fragment (machine-readable)
+
+#### Feedback Schema
+
+```markdown
+## Task N: <Title>
+
+**Status**: <completed | failed | skipped | partial>
+**OMO Task ID**: <uuid>
+**Started**: <ISO-8601>
+**Finished**: <ISO-8601>
+**Agent Category**: <category>
+**Skills Loaded**: [<skill1>, <skill2>]
+
+**Evidence**:
+- <path to evidence file or artifact>
+
+**Commit Result**:
+- Commit: `<hash>`
+- Message: `[<prefix>] <message>`
+- Files: `<path1>`, `<path2>`
+
+**Delta Summary**:
+- Lines added: <N>
+- Lines removed: <N>
+- Files changed: <N>
+
+**Blockers for Downstream**:
+- <none | list of unresolved issues>
+```
+
+#### State Update Rules
+
+| OMO Result | GSD `STATE.md` Action |
+|---|---|
+| Agent reports success + all acceptance criteria pass | Mark task `completed`. Append evidence path. Trigger downstream dispatch. |
+| Agent reports success + some criteria skipped | Mark task `partial`. Append rationale. Trigger downstream **with warning**. |
+| Agent reports failure | Mark task `failed`. Append error summary. **Halt wave**. Invoke replanning protocol. |
+| Agent timeout / no response after threshold | Mark task `failed`. Append `TIMEOUT`. **Halt wave**. |
+| Commit created by agent | Record commit hash, message, and file list under `Commit Result`. |
+
+#### GSD `boulder.json` Sync
+
+For machine consumption, the adapter also patches `boulder.json`:
+
+```json
+{
+  "tasks": {
+    "task-N": {
+      "status": "completed",
+      "omo_task_id": "uuid",
+      "started_at": "2026-05-26T09:00:00Z",
+      "finished_at": "2026-05-26T09:15:00Z",
+      "commit": "abc1234",
+      "evidence": ".sisyphus/evidence/task-N-result.txt"
+    }
+  }
+}
+```
+
+### 1.9 Example: Full Handoff
+
+**GSD Source (PLAN.md fragment)**:
+
+```markdown
+- [ ] 8. Design GSD→OMO Handoff Contract
+
+  **What to do**:
+  - Task mapping: GSD PLAN.md task fields → OMO task() parameters
+  - Dependency handling: GSD waves → OMO run_in_background/sequencing
+  - State feedback: OMO execution results → GSD STATE.md updates
+
+  **Must NOT do**:
+  - Không implement adapter đầy đủ (chỉ spike)
+  - Không sửa GSD hoặc OMO internal code
+
+  **Recommended Agent Profile**:
+  - **Category**: `deep`
+    - Reason: Cần hiểu cả GSD task model và OMO execution model
+  - **Skills**: [`git-master`]
+
+  **Parallelization**:
+  - **Can Run In Parallel**: YES
+  - **Parallel Group**: Wave 2 (with Tasks 6, 7, 9, 10)
+  - **Blocked By**: Task 5 + Task 1
+
+  **Acceptance Criteria**:
+  - [ ] `AI-in-sdlc/docs/HANDOFF-CONTRACTS.md` §GSD→OMO
+  - [ ] Task field mapping table + dependency/wave mapping
+  - [ ] Result feedback protocol
+
+  **Commit**: YES
+  - Message: `[int] design: GSD-to-OMO handoff contract`
+  - Files: `AI-in-sdlc/docs/HANDOFF-CONTRACTS.md`
+```
+
+**Generated OMO Invocation**:
+
+```typescript
+task(
+  category: "deep",
+  load_skills: ["git-master"],
+  description: "Design GSD-to-OMO handoff contract",
+  prompt: `
+## Task
+Design GSD→OMO Handoff Contract
+
+### Description
+- Task mapping: GSD PLAN.md task fields → OMO task() parameters
+- Dependency handling: GSD waves → OMO run_in_background/sequencing
+- State feedback: OMO execution results → GSD STATE.md updates
+
+### Guardrails
+- Không implement adapter đầy đủ (chỉ spike)
+- Không sửa GSD hoặc OMO internal code
+
+### Context Files
+- AI-in-sdlc/docs/spikes/gsd-omo-handoff.md — Spike results
+- AI-in-sdlc/docs/spikes/system-conventions.md — System conventions
+
+### Acceptance Criteria
+- [ ] AI-in-sdlc/docs/HANDOFF-CONTRACTS.md §GSD→OMO
+- [ ] Task field mapping table + dependency/wave mapping
+- [ ] Result feedback protocol
+
+### Commit Instruction
+Message: [int] design: GSD-to-OMO handoff contract
+Files: AI-in-sdlc/docs/HANDOFF-CONTRACTS.md
+  `,
+  run_in_background: true
+)
+```
+
+**Generated State Feedback (after completion)**:
+
+```markdown
+## Task 8: Design GSD→OMO Handoff Contract
+
+**Status**: completed
+**OMO Task ID**: omo-uuid-8
+**Started**: 2026-05-26T09:00:00Z
+**Finished**: 2026-05-26T09:42:00Z
+**Agent Category**: deep
+**Skills Loaded**: [git-master]
+
+**Evidence**:
+- .sisyphus/evidence/task-8-handoff-gsd-omo.txt
+
+**Commit Result**:
+- Commit: `a1b2c3d`
+- Message: `[int] design: GSD-to-OMO handoff contract`
+- Files: `AI-in-sdlc/docs/HANDOFF-CONTRACTS.md`
+
+**Delta Summary**:
+- Lines added: 312
+- Lines removed: 0
+- Files changed: 1
+
+**Blockers for Downstream**:
+- none
+```
+
+### 1.10 Validation Rules
+
+Before dispatch, the adapter validates the handoff:
+
+| Check | Failure Action |
+|---|---|
+| Task title present and non-empty | Reject with `MALFORMED_TASK_TITLE` |
+| `description` ≤ 80 chars after truncation | Truncate and append `…` |
+| `category` in OMO allow-list | Fallback to `"deep"`, log warning |
+| `load_skills` entries exist in OMO registry | Drop unknowns, log warning |
+| `Blocked By` tasks exist in parsed DAG | Reject with `UNKNOWN_DEPENDENCY` |
+| No circular dependencies in wave | Reject with `CIRCULAR_DEPENDENCY` |
+| `Acceptance Criteria` has ≥ 1 item | Warn `NO_ACCEPTANCE_CRITERIA` |
+| Evidence path is writable | Pre-create directory if missing |
+
+### 1.11 Error & Replanning Protocol
+
+When validation fails or an OMO task fails mid-flight:
+
+1. **Log** the failure to `.planning/STATE.md` and `boulder.json`.
+2. **Halt** the current wave; do not dispatch downstream tasks.
+3. **Surface** a concise summary to the user:
+   ```
+   [GSD→OMO] Task N failed: <reason>
+   Affected downstream: Task M, Task O
+   Options:
+   [1] Retry Task N
+   [2] Replan — modify PLAN.md and reload
+   [3] Skip Task N and continue (human override)
+   ```
+4. **Await** human input before proceeding (replanning gate).
+
+---
+
 ## Future Contracts
 
 - Dev → QA Handoff (test automation artifacts)
