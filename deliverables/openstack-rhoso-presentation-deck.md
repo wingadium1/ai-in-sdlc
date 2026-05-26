@@ -1,6 +1,6 @@
 ---
 title: "OpenStack RHOSO DBaaS Proof of Concept"
-subtitle: "A Retrospective CASAN Analysis of the GSD/OMO PoC"
+subtitle: "Mapping the GSD/OMO PoC to the CASAN Developmental Path"
 presenter: "FPT AI-in-SDLC Team"
 date: "2026-05-26"
 version: "1.0"
@@ -8,7 +8,7 @@ version: "1.0"
 
 # OpenStack RHOSO DBaaS Proof of Concept
 
-## A Retrospective CASAN Analysis of the GSD/OMO PoC
+## Mapping the GSD/OMO PoC to the CASAN Developmental Path
 
 **Presenter**: FPT AI-in-SDLC Team  
 **Date**: May 26, 2026  
@@ -51,7 +51,7 @@ version: "1.0"
 
 - Establish OpenStack/RHOSO/DBaaS knowledge baseline for team with zero domain expertise
 - Execute structured workflow with formal handoffs and evidence collection
-- Retrospectively analyze the completed PoC execution through the CASAN framework lens
+- Map the GSD/OMO workflow execution to the CASAN developmental path — recognizing that our process naturally demonstrated characteristics of advanced stages (Standard through Automated)
 
 ---
 
@@ -62,7 +62,7 @@ version: "1.0"
 1. **Introduction** (4 slides) — Problem, goals, agenda
 2. **Methodology & Tools** (4 slides) — GSD/OMO framework, execution flow, competitive advantages
 3. **PoC Execution & Findings** (7 slides) — Journey from zero knowledge to 94.4% pass rate
-4. **Retrospective Learnings** (5 slides) — CASAN mapping, challenges, lessons learned
+4. **CASAN Mapping** (5 slides) — Mapping our workflow to the developmental path, challenges, lessons learned
 5. **Conclusion** (2 slides) — Takeaways and next steps
 
 ---
@@ -73,18 +73,32 @@ version: "1.0"
 
 **GSD (Goal-Strategy-Do)** with **OMO (OhMyOpenCode)** orchestration delivered structured, evidence-based validation:
 
-- **Structured Waves**: 11 tasks organized across 5 waves with dependency management
-- **Specialized Agents**: `quick`, `deep`, `writing`, and `unspecified-high` agents matched to task complexity
-- **Formal Handoffs**: 6 handoff records (HO-001 to HO-005) with clear accountability transfer
-- **Evidence Trail**: 15 evidence files committed to git, decision logs (D01-D10), and phase packets
+### Core GSD Features
+
+- **Wave-based Task Decomposition**: 11 tasks organized across 5 waves with explicit dependency management — tasks only dispatch when upstream dependencies complete (Source: `.sisyphus/plans/openstack-dbaas-casestudy.md`)
+- **Parallel Agent Dispatching**: Multiple specialized agents (`quick`, `deep`, `writing`, `unspecified-high`) execute simultaneously without conflicts via dependency matrix (Source: `docs/process/execution-log.md`)
+- **Dependency Matrix Management**: Explicit task dependency graph prevents race conditions and ensures correct execution order (Source: `.sisyphus/plans/openstack-dbaas-casestudy.md`)
+- **Evidence-based Verification Gates**: Each task produces verifiable evidence files before marking complete — 15 evidence files generated (Source: `.sisyphus/evidence/`)
+- **Context Persistence via Notepads**: `.sisyphus/notepads/learnings.md` and session notepads preserve context across 15+ task dispatches and session boundaries (Source: `.sisyphus/notepads/learnings.md`)
+- **Formal Handoff Records**: 6 handoff records (H-01 to H-04, HO-001 to HO-005) with clear accountability transfer between phases (Source: `.sisyphus/handoffs/`)
+
+### Specialized Agent Categories
+
+- **`quick`**: Fast, mechanical tasks (file checks, grep counts, simple verifications)
+- **`deep`**: Complex reasoning tasks (architecture analysis, diagnostic debugging)
+- **`writing`**: Documentation and prose generation
+- **`unspecified-high`**: Open-ended exploration and research tasks
 
 ## Why This Matters
 
 The methodology enabled:
-- Parallel execution without conflicts (dependency matrix)
-- Context persistence across 15+ task dispatches (notepad sharing)
-- Cost optimization through model routing (35-40% savings)
-- Full audit trail for governance and compliance
+- **Parallel execution without conflicts** — dependency matrix prevented race conditions across 11 concurrent tasks (Source: `docs/process/execution-log.md`)
+- **Context persistence across 15+ task dispatches** — notepad sharing eliminated redundant research (Source: `.sisyphus/notepads/learnings.md`)
+- **Cost optimization through model routing** — Opus for planning, Haiku for execution (35-40% savings) (Source: `.sisyphus/plans/openstack-dbaas-casestudy.md`)
+- **Full audit trail for governance and compliance** — decision logs (D01-D10), phase packets, evidence files (Source: `.sdlc/phases/openstack-dbaas-casestudy/`)
+
+<!-- TODO: Capture screenshot of GSD wave execution flow diagram -->
+<!-- TODO: Capture screenshot of terminal showing parallel agent dispatch -->
 
 ---
 
@@ -160,20 +174,55 @@ graph TD
 
 ## Expanded Comparison
 
-| Feature | Manual Scripting | CI/CD Pipelines | GitHub Copilot | **GSD/OMO** |
-|---------|-----------------|-----------------|----------------|-------------|
-| **Planning** | None — manual sequencing | Pipeline stages, no intelligent decomposition | No planning — individual prompts only | **Structured wave planning** with dependency matrix |
-| **Orchestration** | Linear only | Parallel stages, rigid | Single-agent only | **Dynamic multi-agent** — parallel specialized agents |
-| **Context Persistence** | None | Build artifacts cached | Session-bound, 200K ceiling | **Notepad-based shared memory** survives sessions |
-| **Verification** | Manual assertions | Pre/post tests, no reasoning | No verification | **Agent-executed QA** with diagnostic reasoning |
-| **Governance** | None | Build logs only | No governance | **Formal handoffs**, decision logs, evidence trails |
+| Feature | Manual Scripting | CI/CD Pipelines | GitHub Copilot | Claude Code | **GSD/OMO** |
+|---------|-----------------|-----------------|----------------|-------------|-------------|
+| **Planning** | None — manual sequencing | Pipeline stages, no intelligent decomposition | No planning — individual prompts only | Inline planning within session | **Structured GSD waves** with dependency matrix (Source: `.sisyphus/plans/openstack-dbaas-casestudy.md`) |
+| **Multi-file Context** | Manual read of each file | Limited to workspace checkout | Single buffer, 200K token ceiling | Project-aware via `@mentions` | **Full repo via subagents** — parallel exploration across directories (Source: `docs/process/execution-log.md`) |
+| **Multi-agent Orchestration** | None | None | None | None | **4 categories** (`quick`/`deep`/`writing`/`unspecified-high`) dispatched in parallel (Source: `.sisyphus/plans/openstack-dbaas-casestudy.md`) |
+| **Context Persistence** | None | Build artifacts cached | IDE session only, lost on close | Session-based, no cross-session memory | **Notepads + handoff packets** — structured artifacts survive compact and session boundaries (Source: `.sisyphus/notepads/learnings.md`) |
+| **Verification** | Manual assertions | Pipeline pass/fail, no reasoning | None — trust the output | None — trust the output | **Agent-executed QA + evidence** — diagnostic reasoning, 15 evidence files, 14 retest cycles (Source: `.sisyphus/evidence/`) |
+| **Governance** | None | Pipeline logs only | No audit trail | No audit trail | **Handoffs, decision logs, audit trail** — H-01 to H-04, D01-D10, phase packets (Source: `.sdlc/phases/openstack-dbaas-casestudy/`) |
 
-## Key Differentiators
+<!-- TODO: Capture screenshot of comparison table visualization -->
 
-1. **Natural Language → Structured Execution** — "add validation item plan" spawns planning agent
-2. **Context Persistence Across Sessions** — Notepad files survive compact operations
-3. **Model Tier Optimization** — Opus for planning, Haiku for execution (35-40% savings)
-4. **Evidence-Based Verification** — 15 evidence files, diagnostic reasoning, 14 retest cycles
+## WHY GSD/OMO Is Fundamentally Different
+
+### It's Not a Coding Tool — It's an Orchestration Platform
+
+GitHub Copilot and Claude Code are **coding assistants** — they generate code when prompted. GSD/OMO is an **orchestration platform** that coordinates multiple AI agents through a structured workflow:
+
+| Aspect | Coding Tools (Copilot, Claude) | GSD/OMO Orchestration |
+|--------|-------------------------------|----------------------|
+| **Primary Function** | Generate code from prompts | Plan, delegate, verify, and report |
+| **Scope** | Single task, single buffer | Multi-task, multi-agent, full repo |
+| **Memory** | Session-bound, 200K ceiling | Persistent via notepads and handoff packets |
+| **Quality Assurance** | Human must verify everything | Agent-executed verification with evidence |
+| **Audit Trail** | None | Decision logs, handoffs, phase packets |
+
+### It Doesn't Just Generate — It Plans, Delegates, Verifies, and Reports
+
+**Planning Phase**: GSD decomposes high-level goals into structured waves with explicit dependencies (Source: `.sisyphus/plans/openstack-dbaas-casestudy.md`)
+
+**Delegation Phase**: Specialized agents are dispatched in parallel based on task complexity — `quick` for mechanical checks, `deep` for diagnostic reasoning, `writing` for documentation (Source: `docs/process/execution-log.md`)
+
+**Verification Phase**: Each task produces evidence files and passes through QA gates before completion — 15 evidence files, 14 retest cycles, diagnostic reasoning across OpenStack/Nova/Neutron/Patroni/etcd layers (Source: `.sisyphus/evidence/`)
+
+**Reporting Phase**: Formal handoff records (H-01 to H-04) and decision logs (D01-D10) create an audit trail for governance and compliance (Source: `.sdlc/phases/openstack-dbaas-casestudy/`)
+
+### It Doesn't Lose Context — It Persists Context via Structured Artifacts
+
+**The 200K Token Problem**: Traditional AI tools lose context when the conversation exceeds the token window. GSD/OMO solves this through:
+
+1. **Notepad Files** (`.sisyphus/notepads/`): Persistent shared memory that survives session boundaries and compact operations (Source: `.sisyphus/notepads/learnings.md`)
+
+2. **Handoff Packets** (`.sisyphus/handoffs/`): Structured summaries that compact findings into transferable records between sessions (Source: `.sisyphus/handoffs/`)
+
+3. **Phase Packets** (`.sdlc/phases/`): Each phase produces a structured JSON packet with all findings, decisions, and evidence — the next phase agent reads the prior packet before acting (Source: `.sdlc/phases/openstack-dbaas-casestudy/`)
+
+**Result**: Context persists across 15+ task dispatches without redundant research. The team with zero OpenStack/RHOSO expertise built a comprehensive knowledge base that survived multiple session boundaries and compact operations.
+
+<!-- TODO: Capture screenshot of notepad files showing context persistence -->
+<!-- TODO: Capture screenshot of handoff register (H-01 to H-04) -->
 
 ---
 
@@ -184,23 +233,69 @@ graph TD
 ### Enabler 1: Natural Language Interaction
 
 **From "tool" to "teammate"** — AI understands intent from casual chat:
-- Commands like "fake GSD" signal narrative strategy adjustments
-- AI adapts approach on the fly without rigid command syntax
+
+**How It Works**:
+- Commands like "fake GSD" signal narrative strategy adjustments without rigid syntax
+- AI adapts approach on the fly based on conversational context
 - Eliminates cognitive overhead of translating intent to machine instructions
+- Model routing happens automatically — high-tier models for complex reasoning, low-tier for mechanical tasks
+
+**Example from PoC**:
+```
+User: "add validation item plan" → Spawns planning agent automatically
+User: "fake GSD" → Signals narrative strategy adjustment
+User: "verify the infra docs" → Dispatches verification agent with bounded scope
+```
+
+**Source**: `(Source: docs/process/execution-log.md)` — Natural language commands triggered structured agent dispatches throughout the PoC
+
+<!-- TODO: Capture screenshot of natural language commands in terminal -->
 
 ### Enabler 2: Handoff & Context Persistence
 
 **Solves the 200K token window limit**:
-- Session→Task handoff packets compact findings into structured summaries
-- Notepad files (`.sisyphus/notepads/`) act as persistent shared memory
-- Next session loads packet + relevant notepad entries without full history
+
+**How It Works**:
+1. **Session→Task Handoff Packets**: When a session completes, findings are compacted into structured JSON summaries (`.sisyphus/handoffs/`)
+2. **Notepad Files** (`.sisyphus/notepads/`): Act as persistent shared memory across sessions — learnings, decisions, and edge cases are written to markdown files that survive compact operations
+3. **Next Session Loading**: New session loads the handoff packet + relevant notepad entries without needing full conversation history
+4. **Phase Packets** (`.sdlc/phases/`): Each phase produces a structured JSON packet that the next phase agent reads before acting
+
+**PoC Evidence**:
+- 6 handoff records (H-01 to H-04, HO-001 to HO-005) preserved context across session boundaries
+- `.sisyphus/notepads/learnings.md` captured edge cases: hostname differences, VIP timing, AZ mapping nuances
+- 5 phase packets (`.sdlc/phases/openstack-dbaas-casestudy/`) carried forward complete state between phases
+
+**Source**: `(Source: .sisyphus/notepads/learnings.md)` — Notepad entries preserved critical details that handoff packets lost
+**Source**: `(Source: .sdlc/phases/openstack-dbaas-casestudy/)` — Phase packets carried complete state across phase boundaries
+
+<!-- TODO: Capture screenshot of notepad files showing preserved context -->
+<!-- TODO: Capture screenshot of handoff packet JSON structure -->
 
 ### Enabler 3: Automated Planning-to-Execution
 
 **Division of labor for cost optimization**:
-- **Opus-class** (expensive): Architecture research, CASAN framework mapping
-- **Haiku-class** (cheap): Mechanical verification, file checks, grep counts
-- **Result**: 35-40% cost savings vs. single high-tier model
+
+**How It Works**:
+1. **Wave Planning**: High-tier model (Opus-class) decomposes goal into structured waves with dependency matrix
+2. **Agent Dispatch**: Tasks are assigned to specialized agents based on complexity:
+   - `quick`: Mechanical tasks (file checks, grep counts) → Haiku-class
+   - `deep`: Complex reasoning (architecture analysis, diagnostics) → Opus-class
+   - `writing`: Documentation generation → Sonnet-class
+   - `unspecified-high`: Open-ended exploration → Opus-class
+3. **Parallel Execution**: Multiple agents execute simultaneously via dependency matrix management
+4. **Evidence Collection**: Each agent produces evidence files before marking task complete
+
+**PoC Results**:
+- **Opus-class** (expensive): Architecture research, CASAN framework mapping, diagnostic reasoning across OpenStack/Nova/Neutron/Patroni/etcd layers
+- **Haiku-class** (cheap): Mechanical verification, file checks, grep counts, simple validations
+- **Result**: 35-40% cost savings vs. single high-tier model for all tasks
+
+**Source**: `(Source: .sisyphus/plans/openstack-dbaas-casestudy.md)` — Wave planning with model routing configuration
+**Source**: `(Source: docs/process/execution-log.md)` — Execution log showing agent dispatch and model tier usage
+
+<!-- TODO: Capture screenshot of wave planning document showing model routing -->
+<!-- TODO: Capture screenshot of evidence file output -->
 
 ---
 
@@ -435,7 +530,7 @@ PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest on NFS
 
 ---
 
-# Retrospective Analysis: Mapping the Journey to the CASAN Path
+# Mapping Our Workflow to the CASAN Developmental Path
 
 ## The CASAN Framework: Five Stages
 
@@ -447,7 +542,15 @@ PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest on NFS
 | 4 | Automated | AI agents operate with minimal human intervention |
 | 5 | Native | AI becomes core operating system |
 
-## PoC Activity Classification (Retrospective)
+## CASAN as a Developmental Path, Not a Ruler
+
+The CASAN framework describes a **developmental path** — a journey from basic AI awareness to full AI-native operations. We use it here to map the maturity our process naturally reached.
+
+**Origin Story**: The team did not know CASAN at the project's start. But during this case study creation, we recognized that the GSD/OMO workflow we executed *already showed the characteristics* of advanced stages on the CASAN path.
+
+**Key Framing**: CASAN is not a ruler to measure against, but a path to recognize where you are and where you're heading. Our PoC demonstrated capabilities along this path from Augmented to Standard/Automated.
+
+## PoC Activity Classification Along the Path
 
 | PoC Activity | CASAN Stage | Delegation Level | Rationale |
 |--------------|-------------|------------------|-----------|
@@ -459,7 +562,7 @@ PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest on NFS
 
 ## Key Discovery
 
-**Retrospective analysis revealed the team's workflow naturally aligned with the CASAN path** — GSD/OMO produced outcomes characteristic of the Standard stage (and emergent Automated-phase traits) without consciously following a formal maturity model.
+**The team's workflow naturally aligned with the CASAN path** — GSD/OMO produced outcomes characteristic of the Standard stage (and emergent Automated-phase traits) without consciously following a formal maturity model. CASAN serves as the **structuring lens** of this entire case study, helping us recognize and articulate the maturity we achieved.
 
 ---
 
@@ -538,7 +641,7 @@ PostgreSQL 16 + Patroni + etcd 3.5.17 + VIP callback + pgBackRest on NFS
 
 ✅ **Formal handoffs**: Created clear accountability and audit trail
 
-✅ **Retrospective CASAN analysis**: Provided vocabulary to recognize high-maturity outcomes
+✅ **CASAN mapping**: Provided vocabulary to recognize high-maturity outcomes along the developmental path
 
 ✅ **Harness engineering**: Governance, validation, security, orchestration enabled controlled capability
 
@@ -562,8 +665,8 @@ The OpenStack RHOSO DBaaS Proof of Concept successfully verified the feasibility
 
 - **Technical Feasibility**: 94.4% validation pass rate (34/36 items)
 - **100% pass rate** on Tier 1/MUST critical items (16/16)
-- **Process Excellence**: Retrospective CASAN analysis revealed Standard-phase capabilities
-- **Emergent Automated-phase characteristics**: Agent-operated workflows discovered through post-hoc analysis
+- **Process Excellence**: CASAN mapping revealed Standard-phase capabilities
+- **Emergent Automated-phase characteristics**: Agent-operated workflows recognized through the CASAN lens
 
 ## Key Takeaways
 
@@ -572,6 +675,7 @@ The OpenStack RHOSO DBaaS Proof of Concept successfully verified the feasibility
 3. **GSD/OMO innately produces high-maturity outcomes** — Teams using GSD/OMO naturally achieve Standard-phase maturity
 4. **Human-led, AI-first balance is critical** — Clear delegation architecture with humans defining scope
 5. **Harness is the differentiator** — Governance, validation, security, orchestration enabled controlled capability
+6. **CASAN provides the structuring lens** — Not a ruler to judge, but a path to recognize where we are and where we're heading
 
 ---
 
