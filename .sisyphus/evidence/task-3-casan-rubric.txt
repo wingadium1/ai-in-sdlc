@@ -1,0 +1,56 @@
+=== TASK 3 EVIDENCE: CASAN Framework Analysis ===
+Generated: 2026-05-26
+Source: refs/Phương-pháp-luận-FPT-CASAN.md (ALPHA/LD/HDCV/FPT, Effective 19/5/2026)
+Output: docs/research/casan-mapping-rubric.md
+
+---
+
+VERIFICATION CHECKLIST:
+[✓] All 5 CASAN levels documented with definitions
+    - Level 1 Curious (xưởng thủ công)
+    - Level 2 Augmented (dây chuyền lắp ráp)
+    - Level 3 Standard (nhà máy thông minh)
+    - Level 4 Automated (doanh nghiệp tự động hóa)
+    - Level 5 Native (sinh vật thông minh vận hành trên hệ điều hành AI)
+
+[✓] Each level includes: definition, key characteristics, technical features, human roles, transition goal
+
+[✓] 4 original thinking layers documented:
+    - Harness Engineering (7 components, 4 simplified groups)
+    - Computational × Inferential Blend
+    - Human-led, AI-first
+    - AI Delegation Architecture
+
+[✓] 6 AI delegation levels (L0-L5) documented with names, meanings, and examples:
+    - L0 Observe
+    - L1 Draft
+    - L2 Recommend
+    - L3 Execute bounded low-risk
+    - L4 Operate bounded workflow
+    - L5 Restricted/high-risk autonomy
+
+[✓] Mapping rubric created with:
+    - Classification criteria table (5 levels × 6 criteria)
+    - PoC activity classification examples (8 activities mapped)
+    - GSD/OMO workflow mapping (8 workflow elements mapped)
+    - Key mapping principles for this PoC
+
+[✓] Additional CASAN components documented:
+    - Governance and security by level (5 levels)
+    - Data readiness standards (6 criteria: Correct, Sufficient, Clean, Live, Unified, Shareable)
+    - BMAD model (Build More Architect Dreams)
+    - 5-layer technical reference architecture
+    - Transition paths between levels (4 transitions)
+    - Change management across levels
+
+[✓] File statistics:
+    - Lines: 468
+    - Sections (##): 34
+    - CASAN mentions: 19
+    - Tables: 8
+
+[✓] No critique or opinion added — reference-only mapping
+[✓] All content sourced from reference document
+
+---
+END OF EVIDENCE
