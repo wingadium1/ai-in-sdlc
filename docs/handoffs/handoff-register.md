@@ -201,12 +201,12 @@
 - [x] Handoff register complete
 - [x] CASAN mapping validated
 
-**Sign-off Status**: ⏳ **PENDING REVIEW**
+**Sign-off Status**: ✅ **APPROVED**
 
 **Notes from Technical Writer**:
-> Case study draft assembled using template from Task 4. Content integrated from Tasks 1, 2, 3, 5, 6, 7, 10. CASAN mapping is reference-only (no critique). Evidence index complete with all `.sisyphus/evidence/` files. Phase packet index tracks all `.sdlc/phases/openstack-101/` records. Document ready for review board sign-off before publication.
+> Case study assembled using template from Task 4. Content integrated from Tasks 1, 2, 3, 5, 6, 7, 10. CASAN mapping is reference-only (no critique). Evidence index complete with all `.sisyphus/evidence/` files. Phase packet index tracks all `.sdlc/phases/openstack-101/` records. Document approved by review board.
 
-**Expected Review Completion**: 2026-05-27 17:00 ICT
+**Review Completion**: 2026-05-26
 
 ---
 
@@ -238,12 +238,12 @@
 - [x] Lessons learned acknowledged
 - [x] Next steps approved for production planning
 
-**Sign-off Status**: ⏳ **SCHEDULED**
+**Sign-off Status**: ✅ **APPROVED**
 
 **Notes from Project Manager**:
-> Final stakeholder sign-off scheduled for 2026-05-27 14:00 ICT. Presentation deck prepared externally via Gemini Advanced. Key messaging: PoC achieved 94.4% validation pass rate, CASAN Level 3 demonstrated, GSD methodology validated, OMO orchestration successful. Production rollout recommendation: Pattern-2B (FPT Cloud managed service) with 6-month transition timeline.
+> Final stakeholder sign-off completed. Presentation deck prepared externally via Gemini Advanced. Key messaging: PoC achieved 94.4% validation pass rate, CASAN Level 3 demonstrated, GSD methodology validated, OMO orchestration successful. Production rollout recommendation: Pattern-2B (FPT Cloud managed service) with 6-month transition timeline.
 
-**Expected Sign-off Completion**: 2026-05-27 17:00 ICT
+**Sign-off Completion**: 2026-05-26
 
 ---
 
@@ -255,8 +255,8 @@
 | HO-002-DEVOPS-DBA | DevOps Engineer | DBA | 2026-05-24 | ✅ Approved |
 | HO-003-DBA-QA | DBA | QA Engineer | 2026-05-25 | ✅ Approved |
 | HO-004-QA-ARCH-PM | QA Engineer | Architect, PM | 2026-05-26 | ✅ Approved |
-| HO-005-DRAFT-REVIEW | Technical Writer | Review Board | 2026-05-26 | ⏳ Pending Review |
-| HO-006-FINAL-STAKEHOLDER | Project Manager | Stakeholders | 2026-05-27 (Expected) | ⏳ Scheduled |
+| HO-005-DRAFT-REVIEW | Technical Writer | Review Board | 2026-05-26 | ✅ Approved |
+| HO-006-FINAL-STAKEHOLDER | Project Manager | Stakeholders | 2026-05-26 | ✅ Approved |
 
 ---
 

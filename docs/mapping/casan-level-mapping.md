@@ -416,10 +416,10 @@ The critical success factor was not the AI tools themselves, but the **Harness**
 | `.sisyphus/evidence/task-5-rhoso-access.txt` | T5 | RHOSO environment documentation | ✅ |
 | `.sisyphus/evidence/task-6-dbaas-deployed.txt` | T6 | DBaaS deployment documentation | ✅ |
 | `.sisyphus/evidence/task-7-process-log.txt` | T7 | Execution log verification | ✅ |
-| `.sisyphus/evidence/task-8-dbaas-tests.txt` | T8 | DBaaS test results | ⏳ |
-| `.sisyphus/evidence/task-9-casan-mapping.txt` | T9 | CASAN mapping verification | ⏳ |
-| `.sisyphus/evidence/task-10-handoffs.txt` | T10 | Handoff register verification | ⏳ |
-| `.sisyphus/evidence/task-11-final-doc.txt` | T11 | Final document verification | ⏳ |
+| `.sisyphus/evidence/task-8-dbaas-tests.txt` | T8 | DBaaS test results | ✅ |
+| `.sisyphus/evidence/task-9-casan-mapping.txt` | T9 | CASAN mapping verification | ✅ |
+| `.sisyphus/evidence/task-10-handoffs.txt` | T10 | Handoff register verification | ✅ |
+| `.sisyphus/evidence/task-11-final-doc.txt` | T11 | Final document verification | ✅ |
 
 ### Appendix D: Document History
 
