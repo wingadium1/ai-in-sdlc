@@ -125,7 +125,73 @@ This case study follows the CASAN framework methodology for AI-native capability
 
 The methodology embodies CASAN's "Human-led, AI-first" principle: humans define vision and constraints, AI Agents execute bounded tasks within clear scope, and human validators review all outputs before integration.
 
-### 1.4 Document Structure
+### 1.4 Why GSD/OMO Over GitHub Copilot
+
+GitHub Copilot assists a single developer writing code. GSD/OMO orchestrates a team of AI agents executing a structured delivery pipeline. This section explains the specific gaps.
+
+| Capability | GitHub Copilot | GSD/OMO |
+|-----------|---------------|---------|
+| Multi-file context | Single IDE buffer only | Full repo access via explore/librarian subagents |
+| Planning | None — code completion only | 11 tasks in 5 waves with explicit dependency matrices |
+| Multi-agent orchestration | None | 3-4 agents dispatched simultaneously per wave |
+| Evidence-based verification | None | Agent-executed QA with evidence files committed to git |
+| Context persistence | Lost on IDE restart | Notepad system preserving decisions across 15 task dispatches |
+| Governance & audit trail | None | Structured handoffs, decision logs, git-committed evidence |
+
+**Key Insight**: Copilot operates at CASAN Level 1-2 (Curious/Augmented). GSD/OMO elevates to Level 3-4 (Standard/Automated).
+
+### 1.5 AI-Augmented Repetitive Work That Required Thinking
+
+This section documents three concrete examples where AI augmentation transformed repetitive but cognitively demanding work.
+
+#### Example 1: Automated Validation Retest Cycles
+
+The PoC executed 14 validation retest cycles, each following the pattern: run test → analyze failure → diagnose root cause → fix → retest → capture evidence.
+
+| V-Item | Failure Mode | AI Diagnosis | Resolution |
+|--------|-------------|--------------|------------|
+| V4 | Patroni failover timeout | Detected 3.2s VIP gap during failover | Patroni config tuning |
+| V11-PB | pgBackRest backup failure | WAL archiving not enabled | Enabled continuous archiving |
+| V12 | Volume resize failed | Storage backend quota exceeded | Quota increase + retry |
+| V19 | VIP endpoint instability | MetalLB configuration drift | Reapplied MetalLB config |
+| V26 | Prometheus scrape failures | Service monitor selector mismatch | Fixed selector labels |
+| V33-PB | PITR restore failed | Missing WAL segment in archive | WAL retention policy fix |
+| V36 | Alertmanager routing error | Route tree regex incorrect | Corrected regex pattern |
+
+**Why it matters**: A bash script could run the tests, but could not diagnose WHY V19 had a 3.2-second VIP gap and propose the Patroni config fix. AI closed the loop: detect → diagnose → fix → verify.
+
+**Evidence**: 14 commits in `openstack-101` with `fix(validation):` prefix.
+
+#### Example 2: OVS Flow Script Debug & Parameterize
+
+**Reference commits**:
+- `fix(scripts): batch SSH in apply-aws-ovs-flows-100g to prevent timeout`
+- `feat(scripts): parameterize apply-aws-ovs-flows-100g.sh`
+
+**AI workflow**:
+1. AI wrote initial OVS automation script
+2. Script failed with SSH timeout on batch operations
+3. AI detected timeout pattern, proposed batch approach with connection pooling
+4. AI parameterized the script for reusability across environments
+
+**Why it matters**: Script automation is trivial. Debugging distributed system interactions (SSH + OVS + network latency) and proposing architectural fixes requires contextual reasoning.
+
+#### Example 3: Model Tiering for Cost Optimization
+
+The PoC employed a tiered model strategy based on task complexity:
+
+| Agent Category | Model Tier | Use Case | Cost Savings |
+|---------------|-----------|----------|--------------|
+| `quick` | Budget models | File I/O, git ops, simple edits | 70% vs premium |
+| `deep` | Premium models | 800-line document analysis, framework mapping | Required for quality |
+| `writing` | Mid-tier models | Case study drafting, slide content | 40% vs premium |
+| `unspecified-high` | Premium models | Complex debugging, architecture decisions | Required for accuracy |
+
+**Overall impact**: 35-40% token cost savings compared to using premium models for all tasks.
+
+**Why it matters**: Cost orchestration is a Level 4 (Automated) capability. Manual model selection would require human intervention per task. GSD/OMO automates this via agent category routing.
+
+### 1.6 Document Structure
 
 This case study is organized as follows:
 
