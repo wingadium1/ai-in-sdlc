@@ -49,3 +49,23 @@
   - No evidence file showing completed physical RHOSO deployment
   - 3 blocking decisions (KP-02, KP-03, KP-05) remain unresolved
 - **Evidence**: Created `.sisyphus/evidence/task-5-rhoso-access.txt`
+
+## Task 6 Findings (2026-05-26) — DBaaS Core Deployment Documentation
+- **Scope**: Document DBaaS deployment configuration and procedures from existing outputs/docs in ~/git/openstack-101 (NO deployment performed)
+- **Primary Source**: `deployment/comparison/dbaas/README.md` — comprehensive DBaaS Configuration Comparison Study with 34 deliverables
+- **Architecture Patterns Evaluated**:
+  - **Pattern-1 (Reuse on RHOSO/OpenStack)**: Customer-managed VM images + Ansible, high operational burden
+  - **Pattern-2A (Production-Ready on RHOSO/OpenStack)**: VM-based production-ready design, custom DBaaS controller TBD (Trove ruled out)
+  - **Pattern-2B (FPT Cloud)**: Managed service, lowest operational burden, RECOMMENDED
+- **Database Engines**: Phase 1 = PostgreSQL (primary); Phase 2 = MySQL, MongoDB, Redis; Phase 3 = Oracle, MS SQL Server, H2, Neo4j, Cassandra
+- **Trove Evaluation**: Ruled out for production — 35/64 requirements supported (54.7%), declining community (2–5 active devs), HA features experimental
+- **PostgreSQL Foundation (Task 7)**: Patroni recommended for cloud-native HA (RTO 30–60s), pgBackRest for backup (10–20x faster than pg_basebackup), 3-tier parameter templates (350–4,900 connections, 14k–105k IOPS)
+- **AWS PoC Validation Results**: 34/36 passed (94.4%), 16/16 T1/MUST critical items passed (100%), 169 evidence files collected (screenshots + command outputs)
+- **Patroni HA Stack**: PostgreSQL 16 + Patroni + etcd 3.5.17 (3-member cluster) + VIP callback script + pgBackRest on AWS EFS
+- **FPT Cloud Documentation**: 45 pages mapped, 10+ questionnaire categories, 6 high-priority pages extracted, 10 documentation gaps identified (API, Terraform, cost, encryption, read replicas, multi-region, compliance, DR, performance tuning, migration tools)
+- **Key Gaps**:
+  - Physical bare-metal deployment INCOMPLETE (physical-rhoso-validation.md is 0 bytes)
+  - Customer hardware specs not yet provided (blocks requirement R13)
+  - SoftBank network team not yet introduced (blocks requirement R3)
+  - Custom DBaaS controller for Pattern-2A deferred to post-assessment phase
+- **Evidence**: Created `.sisyphus/evidence/task-6-dbaas-deployed.txt`

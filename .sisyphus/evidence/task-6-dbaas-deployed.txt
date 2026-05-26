@@ -1,0 +1,370 @@
+# Task 6: DBaaS Core Deployment Documentation
+# Source: ~/git/openstack-101/
+# Date: 2026-05-26
+# Status: DOCUMENTATION ONLY — No deployment performed
+
+================================================================================
+1. EXECUTIVE SUMMARY
+================================================================================
+
+The DBaaS (Database-as-a-Service) deployment for the OpenStack RHOSO PoC has
+been extensively documented in the openstack-101 knowledge base. The AWS PoC
+validation phase achieved 34/36 passed validation items (94.4%), with all
+T1/MUST (critical) items passing at 100%. Physical bare-metal deployment remains
+incomplete and is documented as a gap.
+
+================================================================================
+2. DBaaS ARCHITECTURE OPTIONS DOCUMENTED
+================================================================================
+
+Three architecture patterns were evaluated against the VMware DSM baseline:
+
+Pattern-1: Reuse on RHOSO/OpenStack (SBKK Self-Built)
+  - Infrastructure: Shared RHOSO 18 / upstream OpenStack layer
+  - DBaaS Engine: VM-based reuse model (customer-managed images + Ansible)
+  - Image Ownership: Customer (SBKK)
+  - Admin Console: Must build (Spring Boot BFF + frontend)
+  - HA Model: Existing SBKK model (pgpool / Patroni)
+  - Operational Burden: HIGH
+  - Source: deployment/comparison/dbaas/patterns-comparison/01-architecture-comparison.md
+
+Pattern-2A: Production-Ready on RHOSO/OpenStack
+  - Infrastructure: Same shared OpenStack layer as Pattern-1
+  - DBaaS Engine: VM-based production-ready target design
+  - Image Ownership: To be standardized by target design
+  - Admin Console: Must build (stronger service UI/BFF than P1)
+  - HA Model: Production-ready VM HA (to be selected)
+  - Key Differentiator: Custom DBaaS controller (Trove ruled out; TBD)
+  - Operational Burden: MEDIUM
+  - Source: deployment/comparison/dbaas/patterns-comparison/01-architecture-comparison.md
+
+Pattern-2B: FPT Cloud (Managed Service) — RECOMMENDED
+  - Infrastructure: FPT Smart Cloud (managed OpenStack + FPT RDS)
+  - DBaaS Engine: FPT Cloud RDS (managed service)
+  - Image Ownership: Provider (FPT-managed)
+  - Admin Console: Built-in (FPT portal) — no development required
+  - HA Model: Managed HA/failover by FPT
+  - Operational Burden: LOW
+  - Source: deployment/comparison/dbaas/patterns-comparison/01-architecture-comparison.md
+
+VMware DSM Baseline
+  - Current environment: VMware Data Services Manager on vSphere
+  - Engine Support: PostgreSQL, MySQL only
+  - Cost Driver: Broadcom acquisition raised licensing 200–400%
+  - Source: deployment/comparison/dbaas/README.md
+
+================================================================================
+3. DATABASE ENGINES SUPPORTED
+================================================================================
+
+Phase 1 (Current Focus — Primary Assessment):
+  - PostgreSQL — RDBMS for advanced relational workloads
+
+Phase 2 (Future):
+  - MySQL — RDBMS for primary relational database
+  - MongoDB — NoSQL (Document) for flexible schema
+  - Redis — NoSQL (Key-Value) for caching, session store, pub/sub
+
+Phase 3 (Future):
+  - Oracle, MS SQL Server, H2, Neo4j, Cassandra
+
+Source: deployment/comparison/dbaas/README.md
+
+================================================================================
+4. DEPLOYMENT PROCEDURES AND CONFIGURATIONS
+================================================================================
+
+4.1 AWS RHOSO Validation Environment (PoC — COMPLETED)
+------------------------------------------------------
+Architecture:
+  - OCP Cluster (RHOCP 4.18) with 3 control + 3 worker nodes
+  - RHOSO 18.0 operators (Nova, Neutron, Glance, Keystone, Placement, OVN)
+  - 3 bare-metal EC2 compute nodes (c5d.metal: 96 vCPU, 192GB RAM, 4xNVMe)
+  - RAID5 on each compute node (3 active + 1 hot spare = ~1.8 TB usable)
+  - Monitoring: Prometheus + Alertmanager + Grafana on m5.large
+  - Backup: AWS EFS (NFS-compatible) for pgBackRest
+  - Bastion: t3.medium with public EIP
+
+Network Topology (7 subnets):
+  - ocp-public:     10.0.0.0/24  (Bastion EIP, Monitoring)
+  - ocp-private:    10.0.1.0/24  (OCP internal traffic)
+  - ctlplane:       10.0.10.0/24 (EDPM Ansible → compute SSH)
+  - internalapi:    10.0.11.0/24 (OpenStack API endpoints)
+  - tenant:         10.0.12.0/24 (OVN tunnel, PG replication)
+  - backup/storage: 10.0.13.0/24 (pgBackRest → AWS EFS)
+  - provider:       10.0.14.0/24 (DB VMs, VIP 10.0.14.210)
+
+Patroni HA Cluster Stack:
+  - PostgreSQL 16
+  - Patroni (latest pip release)
+  - etcd 3.5.17 (3-member cluster for quorum)
+  - VIP management via Patroni callback script (patroni-vip.sh)
+  - Cluster scope: pg-cluster
+
+Key Configuration Requirements:
+  - etcd MUST have --enable-v2=true (python-etcd library requirement)
+  - eth0 (ctlplane) must NEVER be enslaved into OVS bridge (AWS constraint)
+  - Dedicated eth1 on separate subnet used for br-ex instead
+
+Source: output/deliverables/requirements/aws-rhoso-validation/aws-rhoso-validation-env-plan-v2.md
+Source: output/deliverables/requirements/aws-rhoso-validation/AWS-POC-FINAL-REPORT.md
+
+4.2 FPT Cloud DBaaS Documentation (Pattern-2B)
+------------------------------------------------
+FPT Cloud Managed Database Engines documentation was fully mapped:
+  - 45 distinct documentation pages discovered and categorized
+  - 10+ questionnaire topic categories mapped
+  - 6 high-priority pages extracted for content verification
+  - Base URL: https://fptcloud.com/documents/managed-fpt-database-engines-new/
+
+Documentation Categories:
+  - Operations (6 pages), Backup & Recovery (5), Security & IAM (4)
+  - Monitoring (4), Concepts (7), Setup (7), Network (3)
+  - Maintenance (3), Configuration (4), Scaling (1)
+
+Documentation Gaps Identified:
+  - API documentation & automation endpoints
+  - Terraform / Infrastructure as Code
+  - Cost estimation & billing details
+  - Encryption (at rest / in transit)
+  - Horizontal scaling / read replicas
+  - Multi-region / cross-region replication
+  - Compliance & detailed audit logging
+
+Source: fpt-docs-extraction/README.md
+Source: fpt-docs-extraction/FPT_CLOUD_DATABASE_DOCUMENTATION_INDEX.md
+
+4.3 Trove Evaluation (Ruled Out)
+---------------------------------
+OpenStack Trove (2024.2 Dalmatian, v22.0.x) was evaluated as a DBaaS controller:
+  - Coverage: 35/64 requirements (54.7%) fully supported
+  - 18/64 (28.1%) partially supported
+  - 11/64 (17.2%) GAPS
+  - Community health: DECLINING (2–5 active developers)
+  - HA/clustering capabilities: EXPERIMENTAL, not production-ready
+  - DECISION: NOT RECOMMENDED for Pattern-2A
+  - Custom DBaaS controller technology TBD for future phase
+
+Source: deployment/comparison/dbaas/task-outputs/task-02-trove/T2-trove-evaluation.md
+
+4.4 PostgreSQL Foundation (Task 7)
+-----------------------------------
+Comprehensive PostgreSQL technical foundation established:
+
+HA Topology:
+  - Patroni recommended for cloud-native automation
+  - pgpool-II for stable traditional environments
+  - Patroni RTO: 30–60 seconds typical
+  - pgpool-II RTO: 10–30 seconds typical
+
+Backup Tool:
+  - pgBackRest recommended (10–20x performance over pg_basebackup)
+  - Enterprise features: incremental backup, PITR, compression, encryption
+
+Parameter Templates:
+  - Three-tier template (Small/Medium/Large)
+  - Connection ranges: 350–4,900
+  - IOPS range: 14,000–105,000
+
+Extensions:
+  - 47 core extensions + 8 popular third-party extensions
+  - PostgreSQL 15/16/17 compatibility matrix
+
+Upgrade Strategy:
+  - pg_upgrade recommended as primary method (1–2 hours downtime)
+  - Logical replication for zero-downtime upgrades
+
+Source: deployment/comparison/dbaas/task-outputs/task-07-postgresql/T7-postgresql-foundation.md
+
+================================================================================
+5. VALIDATION ITEMS AND TEST RESULTS
+================================================================================
+
+5.1 AWS PoC Validation Results (34/36 = 94.4%)
+------------------------------------------------
+Validation Window: 2026-05-13 → 2026-05-19
+
+T1/MUST Items (Critical) — 16/16 PASSED (100%):
+  V1  HA Failover RTO                    ✅ PASSED  2026-05-16
+  V2  VIP Failover Policy                ✅ PASSED  2026-05-17
+  V3  NFS Backup with pgBackRest          ✅ PASSED  2026-05-17
+  V4  Immediate Auto-repair              ✅ PASSED  2026-05-17
+  V5  Nova Evacuate                      ✅ PASSED  2026-05-17
+  V6  IOPS QoS                           ✅ PASSED  2026-05-15
+  V7  RPO/Replication Lag                ✅ PASSED  2026-05-17
+  V9  N-1 Capacity                       ✅ PASSED  2026-05-17
+  V10 Automated Failover                 ✅ PASSED  2026-05-16
+  V11 Vertical Scale-Down                ✅ PASSED  2026-05-16
+  V16 Network Isolation                  ✅ PASSED  2026-05-16
+  V19 VIP Endpoint Stability             ✅ PASSED  2026-05-17
+  V20 Full Backup Scope                  ✅ PASSED  2026-05-17
+  V21 WAL Archive Continuity             ✅ PASSED  2026-05-17
+  V22 Multi-tenant Isolation             ✅ PASSED  2026-05-13
+  V26 CPU Resource Control               ✅ PASSED  2026-05-13
+
+T2/SHOULD Items — 16/16 PASSED (100%):
+  V12 Data Transfer                      ✅ PASSED  2026-05-13
+  V13 DB Porting / Migration             ✅ PASSED  2026-05-17
+  V18 RAID5 Redundancy                   ✅ PASSED  2026-05-13
+  V23 OS Login Control                   ✅ PASSED  2026-05-13
+  V24 Security/Platform Audit            ✅ PASSED  2026-05-13
+  V25 Connection Storm                   ✅ PASSED  2026-05-17
+  V29 User Separation                    ✅ PASSED  2026-05-13
+  V30 Audit Logging                      ✅ PASSED  2026-05-13
+  V31 Privilege Management               ✅ PASSED  2026-05-13
+  V32 Rolling Restart                    ✅ PASSED  2026-05-13
+  V33 Manual Scale-Up                    ⚠️ PASS (PB done, PA pending) 2026-05-13
+  V34 Read Replicas                      ✅ PASSED  2026-05-13
+  V37 Anti-Affinity Server Group         ✅ PASSED  2026-05-17
+
+T3/NICE Items — 2/2 PASSED (100%):
+  V35 Admin Console Operations           ✅ PASSED  2026-05-13
+  V36 API Lifecycle Management           ✅ PASSED  2026-05-13
+
+SKIPPED (2):
+  V8  24h Stability                     ⏭️ SKIP  (deferred to production)
+  V14 Capacity 2000 Instances            ⏭️ SKIP  (design-only, no live test)
+
+Sub-items (2):
+  V11-PA Scale-DOWN Leader               ✅ PASSED  2026-05-13
+  V33-PA Scale-UP Leader                 ✅ PASSED  2026-05-13
+
+Total Findings Documented: 16 (5 AWS-specific, 11 general)
+
+Source: output/deliverables/requirements/aws-rhoso-validation/AWS-POC-FINAL-REPORT.md
+Source: output/deliverables/requirements/aws-rhoso-validation/README.md
+
+5.2 Evidence Files Collected
+-----------------------------
+169 evidence files (screenshots, command outputs) collected in:
+  output/deliverables/requirements/aws-rhoso-validation-env-evidence/
+
+Sample evidence files:
+  V1-cold-rollback-3node.png
+  V2-3node-after.png
+  V6-iops-qos-db.medium-fio.png
+  V9-n1-capacity-baseline-and-test.png
+  V11-scale-down-before.png / V11-scale-down-after.png
+  V16-network-isolation-eni.png
+  V19-after-state.png / V19-vip-stability.png
+  V26-cpu-remaining-capacity.png
+  V27-03-connections.png / V27-04-alert-rules.png
+  V30-V31-slow-query-failauth-escalation.png
+  V32-vip-continuity.png
+  V33-scale-up-after.png / V33-PB-after-state.png
+  V37-server-group-show.png
+  rt-v1-hot-01-patroni-cluster-after-rejoin.png
+  v17-pgbench-10c-evidence.png
+
+Source: output/deliverables/requirements/aws-rhoso-validation-env-evidence/
+
+================================================================================
+6. DEPLOYMENT STEPS SUMMARY (What WOULD Be Followed)
+================================================================================
+
+Based on the documented procedures, the following deployment steps would be
+followed for a production DBaaS deployment on RHOSO:
+
+Phase 1: Infrastructure Preparation
+  1. Provision bare-metal compute nodes (3+ nodes with NVMe drives)
+  2. Configure RAID5 on each node (3 active + 1 hot spare)
+  3. Deploy OpenShift 4.18 cluster (3 control + 3 worker nodes)
+  4. Deploy RHOSO 18.0 operators via OpenShift
+  5. Configure EDPM Ansible for compute node management
+  6. Set up 7-subnet network topology (public, private, ctlplane,
+     internalapi, tenant, backup, provider)
+  7. Deploy monitoring stack (Prometheus, Alertmanager, Grafana)
+  8. Configure backup target (NFS or S3-compatible storage)
+
+Phase 2: DBaaS Controller Decision
+  1. Trove has been ruled out — do not use
+  2. For Pattern-2A: Design and build custom DBaaS controller (future phase)
+  3. For Pattern-1: Use Ansible directly for provisioning
+  4. For Pattern-2B: Consume FPT Cloud RDS via portal/API
+
+Phase 3: PostgreSQL HA Cluster Deployment
+  1. Deploy 3-member etcd cluster (enable v2 API for python-etcd)
+  2. Install PostgreSQL 16 on all DB nodes
+  3. Install and configure Patroni on all DB nodes
+  4. Configure streaming replication (synchronous + asynchronous hybrid)
+  5. Deploy VIP callback script for Neutron allowed-address-pairs
+  6. Configure pgBackRest for backup (full + incremental + WAL archive)
+  7. Set up monitoring exporters (node_exporter, pg_exporter)
+  8. Configure Alertmanager rules for WAL lag, disk usage, CPU, failover
+
+Phase 4: Validation
+  1. Execute V1–V37 validation items per TEST-PLAN.md
+  2. Collect evidence (screenshots, command outputs)
+  3. Verify all T1/MUST items pass
+  4. Document findings and mitigations
+
+Source: output/deliverables/requirements/aws-rhoso-validation/TEST-PLAN.md
+Source: output/deliverables/requirements/aws-rhoso-validation/patroni-ha-setup-guide.md
+
+================================================================================
+7. PHYSICAL DEPLOYMENT GAP
+================================================================================
+
+Physical bare-metal deployment on customer hardware is INCOMPLETE:
+  - AWS PoC used nested virtualization (EC2 bare-metal instances)
+  - Physical node validation directory exists but is empty:
+    physical-rhoso-validation.md (0 bytes)
+  - Physical node validation report exists but focuses on RHOSO readiness:
+    output/deliverables/requirements/physical-node-validation/rhoso-readiness-report.md
+  - Customer hardware specs not yet provided (blocked per requirement R13)
+  - SoftBank network team not yet introduced (blocked per requirement R3)
+
+================================================================================
+8. KEY SOURCE FILES REFERENCED
+================================================================================
+
+Primary Documentation:
+  ~/git/openstack-101/deployment/comparison/dbaas/README.md
+  ~/git/openstack-101/deployment/comparison/dbaas/patterns-comparison/README.md
+  ~/git/openstack-101/deployment/comparison/dbaas/patterns-comparison/01-architecture-comparison.md
+  ~/git/openstack-101/deployment/comparison/dbaas/patterns-comparison/06-technical-verification.md
+
+Task Outputs:
+  ~/git/openstack-101/deployment/comparison/dbaas/task-outputs/task-02-trove/T2-trove-evaluation.md
+  ~/git/openstack-101/deployment/comparison/dbaas/task-outputs/task-07-postgresql/T7-postgresql-foundation.md
+  ~/git/openstack-101/deployment/comparison/dbaas/task-outputs/task-25-validation/T25-validation-list.md
+  ~/git/openstack-101/deployment/comparison/dbaas/task-outputs/task-25-validation/T26-validation-master.md
+
+Validation Reports:
+  ~/git/openstack-101/output/deliverables/requirements/aws-rhoso-validation/AWS-POC-FINAL-REPORT.md
+  ~/git/openstack-101/output/deliverables/requirements/aws-rhoso-validation/TEST-PLAN.md
+  ~/git/openstack-101/output/deliverables/requirements/aws-rhoso-validation/README.md
+  ~/git/openstack-101/output/deliverables/requirements/aws-rhoso-validation/dbaas-validation-traceability.md
+
+FPT Cloud Documentation:
+  ~/git/openstack-101/fpt-docs-extraction/README.md
+  ~/git/openstack-101/fpt-docs-extraction/FPT_CLOUD_DATABASE_DOCUMENTATION_INDEX.md
+
+Requirements:
+  ~/git/openstack-101/input/DBaaS Req New.md
+  ~/git/openstack-101/output/deliverables/requirements/dbaas-implementation-report.md
+  ~/git/openstack-101/output/deliverables/requirements/dbaas-requirement-mapping.md
+
+================================================================================
+9. CONCLUSION
+================================================================================
+
+The DBaaS deployment has been thoroughly documented through the AWS PoC
+validation phase, achieving 94.4% pass rate (34/36 items) with 100% critical
+coverage. The architecture using Patroni PostgreSQL HA with etcd DCS, VIP
+callback-based failover, pgBackRest NFS backup, and OVN network isolation is
+validated as functionally correct for the target production use case.
+
+Physical deployment on customer bare-metal hardware remains pending due to:
+  - Customer hardware specs not yet provided
+  - SoftBank network team not yet introduced
+  - These are tracked as blockers in the assessment phase plan
+
+The recommended path forward is Pattern-2B (FPT Cloud managed service) for
+lowest operational burden, or Pattern-2A (production-ready self-built) for
+maximum control, with the custom DBaaS controller build deferred to a later
+phase.
+
+================================================================================
+END OF DOCUMENT
+================================================================================
