@@ -16,7 +16,7 @@ version: 1.0
 
 **Authors**: FPT AI-in-SDLC Team  
 **Organization**: FPT  
-**CASAN Level**: Level 3 (Standard)
+**CASAN Journey Position**: Standard phase — demonstrating governed, repeatable AI-assisted SDLC practices
 
 ---
 
@@ -47,7 +47,7 @@ version: 1.0
 - **Primary Objective**: Verified the feasibility of building a production-ready DBaaS (starting with PostgreSQL) on the OpenStack RHOSO platform
 - **94.4% validation pass rate** (34/36 items) across all DBaaS lifecycle domains
 - HA failover, backup/restore, scaling operations, and monitoring integration validated
-- **CASAN Level 3 (Standard)** maturity with emergent Level 4 (Automated) characteristics
+- **CASAN Journey**: Demonstrated capabilities aligned with the Standard phase, with emergent characteristics of the Automated phase
 - Repeatable, governable AI-assisted SDLC framework for enterprise cloud infrastructure
 
 ## Key Findings
@@ -73,13 +73,13 @@ version: 1.0
 **Primary**:
 - Validate RHOSO architecture readiness for DBaaS deployment
 - Establish OpenStack/RHOSO/DBaaS knowledge baseline for team with zero domain expertise
-- Map PoC execution to CASAN maturity framework
+- Map PoC execution to the CASAN developmental journey
 - Execute structured workflow with formal handoffs and evidence collection
 
 **Secondary**:
 - Create reusable templates and agent patterns
 - Establish audit trail through git-committed evidence files
-- Validate CASAN Level 3 achievement
+- Validate progression along the CASAN journey to the Standard phase
 
 ---
 
@@ -93,7 +93,7 @@ This PoC employed the GSD (Goal-Strategy-Do) methodology with OMO (OhMyOpenCode)
 - **Specialized Agents**: `quick`, `deep`, `writing`, and `unspecified-high` agents matched to task complexity
 - **Formal Handoffs**: 6 handoff records (HO-001 to HO-005) with clear accountability transfer
 - **Evidence Trail**: 15 evidence files committed to git, decision logs (D01-D10), and phase packets
-- **CASAN Mapping**: Continuous maturity assessment against 5-level framework
+- **CASAN Mapping**: Continuous assessment of team progression along the 5-stage CASAN journey
 
 ## Why This Matters
 
@@ -148,20 +148,20 @@ Every task includes agent-executed QA:
 - Diagnostic reasoning across OpenStack/Nova/Neutron/Patroni/etcd layers
 - 14 retest cycles completed in minutes, not days
 
-## CASAN Maturity Comparison
+## CASAN Journey Positioning
 
-| Approach | CASAN Level | Characteristics |
+| Approach | CASAN Stage | Characteristics |
 |----------|-------------|-----------------|
-| Manual Scripting | Level 1 (Curious) | Individual exploration, no governance |
-| CI/CD Pipelines | Level 2 (Augmented) | Licensed tools, individual productivity |
-| GitHub Copilot | Level 1-2 (Curious/Augmented) | AI assists individuals, no orchestration |
-| **GSD/OMO** | **Level 3-4 (Standard/Automated)** | **Structured planning, parallel execution, verification gates, full audit trails** |
+| Manual Scripting | Curious | Individual exploration, no governance |
+| CI/CD Pipelines | Augmented | Licensed tools, individual productivity |
+| GitHub Copilot | Curious–Augmented | AI assists individuals, no orchestration |
+| **GSD/OMO** | **Standard–Automated** | **Structured planning, parallel execution, verification gates, full audit trails** |
 
 ## Core Insight
 
-**GitHub Copilot, manual scripts, and CI/CD pipelines operate at CASAN Level 1-2** — assisting individual developers but lacking orchestration, planning, or governance.
+**GitHub Copilot, manual scripts, and CI/CD pipelines represent early stages of the CASAN journey** — assisting individual developers but lacking orchestration, planning, or governance.
 
-**GSD/OMO elevates to CASAN Level 3-4** with structured planning, parallel execution, verification gates, and full audit trails — enabling complex, multi-step work that would be impossible with individual tools alone.
+**GSD/OMO advances teams along the path to Standard and Automated stages** with structured planning, parallel execution, verification gates, and full audit trails — enabling complex, multi-step work that would be impossible with individual tools alone.
 
 ---
 
@@ -376,7 +376,7 @@ Patroni setup guide at `~/git/openstack-101/deployment/comparison/dbaas/task-out
 
 ## Objective
 
-Establish infrastructure validation, knowledge baseline, and CASAN framework understanding.
+Establish infrastructure validation, knowledge baseline, and understanding of the CASAN developmental journey.
 
 ## Activities
 
@@ -388,9 +388,9 @@ Establish infrastructure validation, knowledge baseline, and CASAN framework und
 - Researched OpenStack architecture, RHOSO deployment model, DBaaS options
 - Produced 4,256-word baseline document
 
-**T3 — CASAN Framework Analysis** (deep):
-- Deep analysis of 5 CASAN levels, 4 thinking layers, Harness Engineering
-- Produced 468-line mapping rubric
+**T3 — CASAN Journey Mapping** (deep):
+- Deep analysis of the 5 CASAN stages as a developmental path, 4 thinking layers, Harness Engineering
+- Produced 468-line journey mapping rubric
 
 ## Evidence
 
@@ -440,9 +440,9 @@ Template structure established; environment state documented as reference.
 - Documented DBaaS lifecycle tests from existing evidence
 - **34/36 tests passed (94.4%)**
 
-**T9 — CASAN Level Mapping** (deep):
-- Mapped PoC execution to CASAN maturity levels
-- Assessed as Level 3 (Standard) with emergent Level 4 characteristics
+**T9 — Mapping the PoC to the CASAN Journey** (deep):
+- Mapped PoC execution to the CASAN developmental path
+- Assessed as demonstrating Standard-phase capabilities with emergent Automated-phase characteristics
 
 **T10 — Handoff Artifact Compilation** (writing):
 - Created formal handoff register with 6 handoff records
@@ -553,49 +553,58 @@ Template structure established; environment state documented as reference.
 | Tier 1/MUST items | 100% | 100% (16/16) | ✅ Yes |
 | Documentation completeness | All sections | 11/11 sections | ✅ Yes |
 | Evidence trail | Per task | 10 evidence files | ✅ Yes |
-| CASAN Level 3 | Yes | Level 3 confirmed | ✅ Yes |
+| CASAN Standard phase | Yes | Standard-phase capabilities demonstrated | ✅ Yes |
 
 ---
 
-# CASAN Framework Mapping
+# Mapping the PoC to the CASAN Journey
 
-## CASAN Levels Overview
+## The CASAN Journey: Five Stages of Evolution
 
-| Level | Name | Description |
+The CASAN framework describes an evolutionary path — not a fixed ruler, but a developmental journey where teams progress from initial curiosity to AI-native operations. Each stage represents a qualitative shift in how humans and AI collaborate.
+
+| Stage | Name | Description |
 |-------|------|-------------|
-| 1 | Curious | Individual exploration, no governance |
-| 2 | Augmented | Licensed tools, individual productivity |
-| 3 | Standard | Standardized, governed, repeatable |
-| 4 | Automated | AI Agents operate workflows |
-| 5 | Native | AI is core operating system |
+| 1 | Curious | The starting point, where individuals begin exploring AI tools with no governance |
+| 2 | Augmented | The team adopts licensed AI tools, boosting individual productivity |
+| 3 | Standard | The organization establishes standardized, governed, repeatable AI-assisted processes |
+| 4 | Automated | AI agents operate workflows with minimal human intervention |
+| 5 | Native | AI becomes the core operating system of the engineering organization |
 
 ## PoC Activity Classification
 
-| PoC Activity | CASAN Level | Delegation Level | Rationale |
+| PoC Activity | CASAN Stage | Delegation Level | Rationale |
 |--------------|-------------|------------------|-----------|
-| Infrastructure validation (T1) | Level 3 | L3 (Execute bounded) | Standardized checklist, governed scope |
-| Knowledge baseline research (T2) | Level 2–3 | L2 (Recommend) | AI proposes, human decides scope |
-| Template design (T4) | Level 2 | L1 (Draft) | AI drafts, human reviews |
-| DBaaS verification (T8) | Level 3–4 | L3–L4 | Agent-operated workflow with control barriers |
-| Handoff compilation (T10) | Level 3 | L3 (Execute bounded) | Formal governance artifact creation |
+| Infrastructure validation (T1) | Standard | L3 (Execute bounded) | Standardized checklist, governed scope |
+| Knowledge baseline research (T2) | Augmented–Standard | L2 (Recommend) | AI proposes, human decides scope |
+| Template design (T4) | Augmented | L1 (Draft) | AI drafts, human reviews |
+| DBaaS verification (T8) | Standard–Automated | L3–L4 | Agent-operated workflow with control barriers |
+| Handoff compilation (T10) | Standard | L3 (Execute bounded) | Formal governance artifact creation |
 
-## PoC Assessment
+## PoC Assessment: A Developmental Transition
 
-**CASAN Level 3 (Standard)** with emergent Level 4 (Automated) characteristics in agent-operated workflows and exception-based human review.
+This PoC demonstrates how the team's capabilities **transitioned along the CASAN path** — from the Augmented stage (using basic AI tools for individual productivity) to the Standard stage (using a governed, structured process like GSD/OMO).
+
+**Key transitions observed**:
+- From ad-hoc AI usage to standardized wave-based execution
+- From individual productivity to multi-agent orchestration with formal handoffs
+- From ungoverned experimentation to decision logs, evidence trails, and audit-ready artifacts
+
+The team now demonstrates **Standard-phase capabilities** with emergent characteristics of the Automated phase in agent-operated workflows and exception-based human review. The goal is not to "hit a number" but to continue progressing along this evolutionary path.
 
 ---
 
 # Harness Maturity Assessment
 
-| Harness Component | Maturity Level | Evidence |
-|-------------------|----------------|----------|
-| Context Harness | Level 3 | Structured notepads, source of truth (`openstack-101`) |
-| Tool Harness | Level 3 | File I/O, git, subagent dispatch with permission boundaries |
-| Validation Harness | Level 3 | Acceptance criteria, QA scenarios, evidence verification |
-| Security Harness | Level 3 | No credentials in agent scope, gitignored `.env` |
-| Governance Harness | Level 3 | Decision log, handoff register, RBAC via agent categories |
-| AgentOps Harness | Level 2 | Basic time tracking; no real-time monitoring |
-| Orchestration Harness | Level 3 | GSD wave structure, dependency matrix, background parallelism |
+| Harness Component | Journey Position | Evidence |
+|-------------------|------------------|----------|
+| Context Harness | Standard phase | Structured notepads, source of truth (`openstack-101`) |
+| Tool Harness | Standard phase | File I/O, git, subagent dispatch with permission boundaries |
+| Validation Harness | Standard phase | Acceptance criteria, QA scenarios, evidence verification |
+| Security Harness | Standard phase | No credentials in agent scope, gitignored `.env` |
+| Governance Harness | Standard phase | Decision log, handoff register, RBAC via agent categories |
+| AgentOps Harness | Augmented phase | Basic time tracking; no real-time monitoring |
+| Orchestration Harness | Standard phase | GSD wave structure, dependency matrix, background parallelism |
 
 ## Key Mapping Principles
 
@@ -645,7 +654,7 @@ Template structure established; environment state documented as reference.
 
 ✅ **Formal handoffs**: Created clear accountability and audit trail; no ambiguity in responsibility transfer
 
-✅ **CASAN framework**: Provided structured maturity assessment with actionable transition path
+✅ **CASAN framework**: Provided a developmental roadmap showing how teams progress from exploration to AI-native operations
 
 ✅ **Harness engineering**: Not the AI tools themselves, but the Harness surrounding them (governance, validation, security, orchestration) enabled controlled, repeatable capability
 
@@ -670,20 +679,23 @@ Template structure established; environment state documented as reference.
 
 ---
 
-# CASAN Level Progression Path
+# Continuing the CASAN Journey
 
-## Current Level: Level 3 (Standard)
+## Current Position: Standard Phase
 
-**Achieved**:
-- Formal AI governance
-- Reusable agent templates
-- Dedicated roles (Orchestrator, Architect, Validator)
-- Structured data lineage
-- ISO 42001 readiness
+Through this PoC, the team has demonstrated capabilities aligned with the **Standard phase** of the CASAN journey:
 
-## Recommended Next Level: Level 4 (Automated)
+- Formal AI governance established
+- Reusable agent templates created
+- Dedicated roles defined (Orchestrator, Architect, Validator)
+- Structured data lineage in place
+- ISO 42001 readiness achieved
 
-**Key Actions Required**:
+This is not a destination — it is a waypoint on a continuous path of evolution.
+
+## Recommended Next Step: Advancing Toward the Automated Phase
+
+**Key actions to continue progressing along the path**:
 
 1. **AgentOps Platform**: Real-time monitoring of agent performance, cost, latency, hallucination rate
 2. **Multi-Agent Orchestration**: Coordinated `deep` + `writing` + `unspecified-high` workflows
@@ -692,7 +704,7 @@ Template structure established; environment state documented as reference.
 5. **Policy Enforcement Engine**: Automated compliance checking and approval workflows
 6. **Validation Pipeline**: Golden datasets, LLM-as-judge, regression test suite
 
-**Timeline**: 6-month transition to Level 4 with focused investments in AgentOps and Multi-Agent orchestration.
+**Timeline**: 6-month focused investment in AgentOps and Multi-Agent orchestration to advance toward the Automated phase.
 
 ---
 
@@ -706,14 +718,14 @@ The OpenStack RHOSO DBaaS Proof of Concept successfully verified the feasibility
 
 - **Technical Feasibility**: 94.4% validation pass rate (34/36 items) across all DBaaS lifecycle domains
 - **100% pass rate** on Tier 1/MUST critical items (16/16)
-- **Process Excellence**: CASAN Level 3 (Standard) maturity with formal governance, reusable templates, dedicated roles
-- **Emergent Level 4**: Agent-operated workflows and exception-based human review
+- **Process Excellence**: Demonstrated Standard-phase capabilities on the CASAN journey with formal governance, reusable templates, dedicated roles
+- **Emergent Automated-phase characteristics**: Agent-operated workflows and exception-based human review
 
 ## Key Takeaways
 
 1. **Production-ready DBaaS is feasible on RHOSO**: The PoC confirmed that RHOSO's containerized control plane, Operator-based lifecycle management, and integration patterns can support a production DBaaS deployment
 2. **Document-based validation is viable**: Comprehensive evidence from existing sources when live infrastructure unavailable
-3. **CASAN Level 3 achievable in single PoC**: With proper Harness engineering, teams can elevate from Level 1 to Level 3 in one cycle
+3. **Rapid progression along the CASAN journey is achievable**: With proper Harness engineering, teams can advance from the Curious stage to the Standard phase in a single PoC cycle
 4. **Human-led, AI-first balance is critical**: Clear delegation architecture with humans defining scope, AI executing bounded tasks
 5. **Harness is the differentiator**: Governance, validation, security, orchestration enabled controlled, repeatable capability
 
@@ -737,11 +749,11 @@ The OpenStack RHOSO DBaaS Proof of Concept successfully verified the feasibility
 
 - Deploy policy enforcement engine for automated compliance
 - Build validation pipeline with golden datasets and LLM-as-judge
-- Advance to CASAN Level 4 (Automated) with full AgentOps and orchestration
+- Advance toward the Automated phase of the CASAN journey with full AgentOps and orchestration
 
 ## Final Recommendation
 
-**Proceed to production planning** with Pattern-2B (FPT Cloud managed service) and 6-month transition timeline. Continue CASAN maturity advancement toward Level 4 with AgentOps and Multi-Agent orchestration investments.
+**Proceed to production planning** with Pattern-2B (FPT Cloud managed service) and a 6-month timeline. Continue progressing along the CASAN journey toward the Automated phase with AgentOps and Multi-Agent orchestration investments.
 
 ---
 
