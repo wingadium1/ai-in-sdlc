@@ -24,7 +24,7 @@ version: 1.0
 
 1. Executive Summary
 2. Project Context & Objectives
-3. Why GSD/OMO Over GitHub Copilot
+3. GSD/OMO vs. The Alternatives
 4. GSD/OMO Enablers
 5. Technical Challenges
 6. AI-Augmented Repetitive Work
@@ -83,24 +83,63 @@ version: 1.0
 
 ---
 
-# Why GSD/OMO Over GitHub Copilot
+# GSD/OMO vs. The Alternatives
 
-## Core Limitations of GitHub Copilot
+## Competitive Comparison
 
-| Limitation | Impact | How GSD/OMO Solved It |
-|------------|--------|----------------------|
-| Single-file context only | OpenStack RHOSO requires 5+ services across 50+ files | OMO `explore`/`librarian` subagents with full repo access |
-| No planning capability | Cannot sequence 11 dependent tasks across 5 waves | GSD decomposed into structured waves with dependency matrix |
-| No multi-agent orchestration | No specialized agents for research, writing, validation | OMO dispatched 3-4 agents simultaneously per wave |
-| No evidence-based verification | Cannot validate against acceptance criteria | Every task included agent-executed QA; 15 evidence files committed |
-| No context persistence | Each session starts fresh | GSD notepads maintained shared context across 15 dispatches |
-| No governance or audit trail | No record of who did what, when, why | Formal handoff records (HO-001 to HO-005), decision logs (D01-D10) |
+| Feature | Manual Scripting (Bash/Python) | CI/CD Pipelines (Jenkins/GitLab) | AI Assistants (GitHub Copilot) | GSD/OMO |
+|---------|-------------------------------|----------------------------------|-------------------------------|---------|
+| **Planning** | None — developer must manually sequence all steps | Pipeline-defined stages, but no intelligent decomposition | No planning capability — responds to individual prompts only | **Structured wave planning** with dependency matrix and intelligent task decomposition |
+| **Orchestration** | Linear execution only — no parallelization or agent coordination | Parallel stages possible, but rigid and pre-configured | Single-agent only — no multi-agent coordination | **Dynamic multi-agent orchestration** — dispatches specialized agents (`explore`, `librarian`, `quick`, `deep`, `writing`) in parallel |
+| **Context Persistence** | None — each script run starts fresh | Build artifacts cached, but no semantic context | Session-bound — 200K token ceiling, context lost between sessions | **Notepad-based shared memory** (`.sisyphus/notepads/`) survives session boundaries and compact operations |
+| **Verification** | Manual assertion checking — developer writes all validation logic | Pre/post-deployment tests, but no diagnostic reasoning | No verification capability — cannot validate against acceptance criteria | **Agent-executed QA** with diagnostic reasoning — parses output, identifies root causes, proposes fixes, verifies results |
+| **Governance** | None — no audit trail or decision records | Build logs only — no decision tracking or handoff records | No governance — no record of who did what, when, why | **Formal handoffs** (HO-001 to HO-005), **decision logs** (D01-D10), **evidence trails** (15+ committed files) |
+
+## Key Differentiators
+
+### 1. Natural Language → Structured Execution
+
+GSD/OMO transforms casual prompts into orchestrated workflows:
+- "add validation item plan" → spawns planning agent with bounded scope
+- "fake GSD" → signals narrative strategy adjustment
+- AI adapts approach without rigid command syntax
+
+### 2. Context Persistence Across Sessions
+
+Solves the 200K token problem:
+- **Session→Task handoff packets** compact findings into structured summaries
+- **Notepad files** act as persistent shared memory across 15+ dispatches
+- Next session loads packet + relevant notepad entries without full history
+
+### 3. Model Tier Optimization
+
+Division of labor for cost efficiency:
+- **Opus-class** (deep reasoning): Architecture research, CASAN mapping, cross-domain analysis
+- **Sonnet-class** (balanced): Template generation, handoff registers, process logs
+- **Haiku-class** (fast/cheap): Mechanical verification, file checks, grep counts
+- **Result**: 35-40% cost savings vs. single high-tier model for all tasks
+
+### 4. Evidence-Based Verification
+
+Every task includes agent-executed QA:
+- 15 evidence files committed to git
+- Diagnostic reasoning across OpenStack/Nova/Neutron/Patroni/etcd layers
+- 14 retest cycles completed in minutes, not days
+
+## CASAN Maturity Comparison
+
+| Approach | CASAN Level | Characteristics |
+|----------|-------------|-----------------|
+| Manual Scripting | Level 1 (Curious) | Individual exploration, no governance |
+| CI/CD Pipelines | Level 2 (Augmented) | Licensed tools, individual productivity |
+| GitHub Copilot | Level 1-2 (Curious/Augmented) | AI assists individuals, no orchestration |
+| **GSD/OMO** | **Level 3-4 (Standard/Automated)** | **Structured planning, parallel execution, verification gates, full audit trails** |
 
 ## Core Insight
 
-**GitHub Copilot operates at CASAN Level 1-2** (Curious/Augmented) — assisting individual developers but lacking orchestration, planning, or governance.
+**GitHub Copilot, manual scripts, and CI/CD pipelines operate at CASAN Level 1-2** — assisting individual developers but lacking orchestration, planning, or governance.
 
-**GSD/OMO elevates to CASAN Level 3-4** (Standard/Automated) with structured planning, parallel execution, verification gates, and full audit trails.
+**GSD/OMO elevates to CASAN Level 3-4** with structured planning, parallel execution, verification gates, and full audit trails — enabling complex, multi-step work that would be impossible with individual tools alone.
 
 ---
 
