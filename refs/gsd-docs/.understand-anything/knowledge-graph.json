@@ -1,0 +1,221 @@
+{
+  "version": "1.0.0",
+  "kind": "knowledge",
+  "project": {
+    "name": "AI-Assisted SDLC Frameworks",
+    "languages": [
+      "markdown"
+    ],
+    "frameworks": [
+      "karpathy-wiki"
+    ],
+    "description": "Knowledge graph for AI-Assisted SDLC Frameworks",
+    "analyzedAt": "2026-05-27T13:12:18.561084+00:00",
+    "gitCommitHash": "9671ffb0a90c5d06d9e3ce91bcb102f206435a99"
+  },
+  "nodes": [
+    {
+      "id": "article:gsd-architecture",
+      "type": "article",
+      "name": "GSD Architecture",
+      "filePath": "gsd-architecture.md",
+      "summary": "GSD is a meta-prompting framework that sits between the user and AI coding agents (Claude Code, Gemini CLI, OpenCode, Kilo, Codex, Copilot, etc.).",
+      "tags": [
+        "overview"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [],
+        "category": "Overview",
+        "content": "# GSD Architecture\n\n## System Overview\nGSD is a meta-prompting framework that sits between the user and AI coding agents (Claude Code, Gemini CLI, OpenCode, Kilo, Codex, Copilot, etc.).\n\n## Layer Stack\n1. **Command Layer** \u2014 commands/gsd/*.md \u2014 Prompt-based command files\n2. **Workflow Layer** \u2014 get-shit-done/workflows/*.md \u2014 Orchestration logic\n3. **Agent Layer** \u2014 Specialized agents with fresh context windows\n4. **CLI Tools Layer** \u2014 gsd-tools.cjs \u2014 Node.js utilities\n5. **File System** \u2014 .planning/ \u2014 PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md\n\n## Design Principles\n1. Fresh Context Per Agent \u2014 eliminates context rot\n2. Thin Orchestrators \u2014 never do heavy lifting\n3. File-Based State \u2014 survives context resets\n4. Absent = Enabled \u2014 feature flags default to true\n5. Defense in Depth \u2014 plan-checker \u2192 executor \u2192 verifier \u2192 UAT\n\n## Agent Model\n- Orchestrator loads context via gsd-tools.cjs\n- Resolves model via gsd-tools.cjs resolve-model\n- Spawns agent with fresh context (up to 200K)\n- Collects result, updates state\n\n## Primary Agents (21)\n- Researchers: gsd-project-researcher, gsd-phase-researcher, gsd-ui-researcher, gsd-advisor-researcher\n- Synthesizers: gsd-research-synthesizer\n- Planners: gsd-planner, gsd-roadmapper\n- Checkers: gsd-plan-checker, gsd-integration-checker, gsd-ui-checker\n- Executors: gsd-executor\n- Verifiers: gsd-verifier\n- Mappers: gsd-codebase-mapper (4 parallel)\n- Debuggers: gsd-debugger\n- Auditors: gsd-ui-auditor, gsd-security-auditor\n- Doc Writers: gsd-doc-writer, gsd-doc-verifier\n- Profilers: gsd-user-profiler\n\n## Wave Execution\nDuring execute-phase, plans are grouped into dependency waves:\n- Plans with no deps \u2192 Wave 1 (parallel)\n- Plans depending on Wave 1 \u2192 Wave 2\n- Each executor gets fresh 200K context\n- Parallel commit safety via --no-verify + STATE.md file locking\n\n## Context Propagation\nPROJECT.md \u2192 All agents\nREQUIREMENTS.md \u2192 Planner, Verifier, Auditor\nROADMAP.md \u2192 Orchestrators\nSTATE.md \u2192 All agents (decisions, blockers)\nCONTEXT.md \u2192 Researcher, Planner, Executor\nRESEARCH.md \u2192 Planner, Plan Checker\nPLAN.md \u2192 Executor, Plan Checker\nSUMMARY.md \u2192 Verifier, State tracking\n",
+        "backlinks": []
+      }
+    },
+    {
+      "id": "article:gsd-readme",
+      "type": "article",
+      "name": "GSD - Get Shit Done Redux",
+      "filePath": "gsd-readme.md",
+      "summary": "GSD is a meta-prompting and context engineering system for AI code editors. It provides structured workflows for Claude Code, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Cursor, Windsurf, and more.",
+      "tags": [
+        "relationships"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [],
+        "category": "Relationships",
+        "content": "# GSD - Get Shit Done Redux\n\n## Overview\nGSD is a meta-prompting and context engineering system for AI code editors. It provides structured workflows for Claude Code, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Cursor, Windsurf, and more.\n\n**Key facts:**\n- npm package: `@opengsd/get-shit-done-redux`\n- 1.2K GitHub stars, 3,115 commits\n- MIT License\n- Works on Mac, Windows, Linux\n\n## Core Loop (6 Commands)\n1. `/gsd-new-project` \u2014 Questions \u2192 research \u2192 requirements \u2192 roadmap\n2. `/gsd-discuss-phase N` \u2014 Capture implementation decisions before planning\n3. `/gsd-plan-phase N` \u2014 Research + plan + verify (up to 3 iterations)\n4. `/gsd-execute-phase N` \u2014 Execute plans in parallel waves\n5. `/gsd-verify-work N` \u2014 Manual acceptance testing\n6. `/gsd-ship N` \u2014 Create PR from verified phase work\n\n## Solves 3 Problems\n1. **Context bloat**: GSD keeps main context clean by doing heavy work in fresh subagent contexts\n2. **No shared memory**: PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md, CONTEXT.md persist across sessions\n3. **No verification**: Verify step walks through what was built, diagnoses failures\n\n## State Files (.planning/)\n- PROJECT.md \u2014 Vision\n- REQUIREMENTS.md \u2014 Scope with REQ-IDs\n- ROADMAP.md \u2014 Where you're going\n- STATE.md \u2014 Current position and decisions\n- CONTEXT.md \u2014 Per-phase implementation decisions\n- config.json \u2014 Model profiles, workflow toggles\n\n## Architecture\n- **Fresh Context Per Agent**: Every spawned agent gets a clean 200K token window\n- **Thin Orchestrators**: Workflow files load context, spawn agents, collect results, update state\n- **File-Based State**: All state in .planning/ as Markdown and JSON\n- **Wave Execution Model**: Plans grouped into dependency waves, executed in parallel\n- **33 agents, 86 commands, 11 hooks**\n",
+        "backlinks": []
+      }
+    },
+    {
+      "id": "article:gsd-user-guide",
+      "type": "article",
+      "name": "GSD User Guide",
+      "filePath": "gsd-user-guide.md",
+      "summary": "`/gsd-new-project` \u2014 Questions about your idea \u2192 parallel research agents \u2192 requirements \u2192 roadmap",
+      "tags": [
+        "overview"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [],
+        "category": "Overview",
+        "content": "# GSD User Guide\n\n## End-to-End Walkthrough\n\n### 1. Create Project\n`/gsd-new-project` \u2014 Questions about your idea \u2192 parallel research agents \u2192 requirements \u2192 roadmap\n\n### 2. Discuss Phase\n`/gsd-discuss-phase 1` \u2014 Capture implementation preferences before planning\n\n### 3. Plan Phase\n`/gsd-plan-phase 1` \u2014 Research agent \u2192 Planner \u2192 Plan Checker (up to 3 iterations)\n- Produces: RESEARCH.md, PLAN.md files, VALIDATION.md\n\n### 4. Execute Phase\n`/gsd-execute-phase 1` \u2014 Wave analysis \u2192 Executor per plan \u2192 atomic commits \u2192 Verifier\n- Each executor gets fresh 200K context window\n- Parallel waves where dependencies allow\n- Produces: SUMMARY.md per plan, VERIFICATION.md\n\n### 5. Verify Work\n`/gsd-verify-work 1` \u2014 Extract deliverables, walk through them, diagnose failures\n\n### 6. Ship\n`/gsd-ship 1` \u2014 Push branch, create PR with auto-generated body\n\n## Workflow Diagrams\n- Full Project Lifecycle: init \u2192 (discuss \u2192 ui? \u2192 plan \u2192 execute \u2192 verify) \u2192 ship \u2192 audit \u2192 complete \u2192 next\n- Planning Agent Coordination: 4 parallel researchers \u2192 Planner \u2192 Plan Checker (loop up to 3x)\n- Validation (Nyquist Layer): Map automated test coverage per requirement before code is written\n\n## Multi-Runtime Support\nGSD supports 15 runtimes: Claude Code, OpenCode, Kilo, Gemini CLI, Codex, Copilot, Antigravity, Trae, Cline, Augment Code, Cursor, Windsurf, Qwen Code, Hermes Agent, CodeBuddy\n\n## Namespace Routing (v1.40)\n6 namespace meta-skills: gsd-workflow, gsd-project, gsd-quality, gsd-context, gsd-manage, gsd-ideate\nEach routes to concrete sub-skills. Keeps eager skill-listing cost low (~120 tokens vs ~2,150).\n",
+        "backlinks": []
+      }
+    },
+    {
+      "id": "article:omo-overview",
+      "type": "article",
+      "name": "omo-overview",
+      "filePath": "omo-overview.md",
+      "summary": "Wiki article: omo-overview",
+      "tags": [
+        "relationships"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [],
+        "category": "Relationships",
+        "content": "---\nid: omo\nname: OMO (OhMyOpenAgent) Overview\ncategory: Tools\n---\n\n",
+        "backlinks": []
+      }
+    },
+    {
+      "id": "topic:overview",
+      "type": "topic",
+      "name": "Overview",
+      "summary": "Category from index: Overview (4 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "topic:core-concepts",
+      "type": "topic",
+      "name": "Core Concepts",
+      "summary": "Category from index: Core Concepts (0 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "topic:relationships",
+      "type": "topic",
+      "name": "Relationships",
+      "summary": "Category from index: Relationships (2 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "article:gsd-readme",
+      "target": "topic:overview",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:gsd-architecture",
+      "target": "topic:overview",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:gsd-user-guide",
+      "target": "topic:overview",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:omo-overview",
+      "target": "topic:overview",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:gsd-readme",
+      "target": "topic:relationships",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:omo-overview",
+      "target": "topic:relationships",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:overview",
+      "name": "Overview",
+      "description": "Overview (5 nodes)",
+      "nodeIds": [
+        "article:gsd-readme",
+        "article:gsd-architecture",
+        "article:gsd-user-guide",
+        "article:omo-overview",
+        "topic:overview"
+      ]
+    },
+    {
+      "id": "layer:core-concepts",
+      "name": "Core Concepts",
+      "description": "Core Concepts (1 nodes)",
+      "nodeIds": [
+        "topic:core-concepts"
+      ]
+    },
+    {
+      "id": "layer:relationships",
+      "name": "Relationships",
+      "description": "Relationships (3 nodes)",
+      "nodeIds": [
+        "article:gsd-readme",
+        "article:omo-overview",
+        "topic:relationships"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Overview",
+      "description": "Explore the Overview section (4 articles)",
+      "nodeIds": [
+        "article:gsd-readme",
+        "article:gsd-architecture",
+        "article:gsd-user-guide"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Core Concepts",
+      "description": "Explore the Core Concepts section (0 articles)",
+      "nodeIds": [
+        "topic:core-concepts"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Relationships",
+      "description": "Explore the Relationships section (2 articles)",
+      "nodeIds": [
+        "article:gsd-readme",
+        "article:omo-overview"
+      ]
+    }
+  ]
+}
