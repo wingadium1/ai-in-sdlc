@@ -1,0 +1,231 @@
+{
+  "format": "karpathy",
+  "stats": {
+    "articles": 7,
+    "sources": 0,
+    "topics": 2,
+    "wikilinks": 5,
+    "unresolved": 1
+  },
+  "categories": [
+    {
+      "name": "Domains",
+      "count": 3
+    },
+    {
+      "name": "Quick Links",
+      "count": 0
+    }
+  ],
+  "logEntries": 0,
+  "nodes": [
+    {
+      "id": "article:concepts/ai-sdlc",
+      "type": "article",
+      "name": "AI-Assisted SDLC Framework",
+      "filePath": "concepts/ai-sdlc.md",
+      "summary": "``` User \u2192 GSD (meta-prompting) \u2192 OMO (agent harness) \u2192 OpenCode (runtime) \u2192 AI Models ```",
+      "tags": [
+        "concepts",
+        "domains"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "frameworks/gsd/README",
+          "frameworks/omo/README"
+        ],
+        "category": "Domains",
+        "content": "# AI-Assisted SDLC Framework\n\n## The Stack\n```\nUser \u2192 GSD (meta-prompting) \u2192 OMO (agent harness) \u2192 OpenCode (runtime) \u2192 AI Models\n```\n\n## How GSD + OMO Work Together\n- **GSD** provides the structured workflow: project initialization, phase discussion, planning, execution, verification, shipping\n- **OMO** provides the agent orchestration: category-based model routing, specialized agents (Sisyphus, Prometheus, Atlas, Oracle, Librarian, Explore)\n- Both run on top of **OpenCode** as the runtime environment\n- Together they form a complete AI-assisted software delivery pipeline\n\n## Key Benefits\n1. **Context engineering** \u2014 Fresh context per agent prevents context rot\n2. **File-based state** \u2014 .planning/ directory persists across sessions\n3. **Category-based model routing** \u2014 Right model for the right task automatically\n4. **Wave-based execution** \u2014 Parallel task execution with dependency management\n5. **Evidence-based verification** \u2014 Each task produces verifiable outputs\n\n## References\n- [[frameworks/gsd/README|GSD Documentation]]\n- [[frameworks/omo/README|OMO Documentation]]\n",
+        "backlinks": []
+      }
+    },
+    {
+      "id": "article:frameworks/gsd/ARCHITECTURE",
+      "type": "article",
+      "name": "GSD Architecture",
+      "filePath": "frameworks/gsd/ARCHITECTURE.md",
+      "summary": "GSD is a meta-prompting framework that sits between the user and AI coding agents (Claude Code, Gemini CLI, OpenCode, Kilo, Codex, Copilot, etc.).",
+      "tags": [
+        "frameworks/gsd"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [],
+        "content": "# GSD Architecture\n\n## System Overview\nGSD is a meta-prompting framework that sits between the user and AI coding agents (Claude Code, Gemini CLI, OpenCode, Kilo, Codex, Copilot, etc.).\n\n## Layer Stack\n1. **Command Layer** \u2014 commands/gsd/*.md \u2014 Prompt-based command files\n2. **Workflow Layer** \u2014 get-shit-done/workflows/*.md \u2014 Orchestration logic\n3. **Agent Layer** \u2014 Specialized agents with fresh context windows\n4. **CLI Tools Layer** \u2014 gsd-tools.cjs \u2014 Node.js utilities\n5. **File System** \u2014 .planning/ \u2014 PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md\n\n## Design Principles\n1. Fresh Context Per Agent \u2014 eliminates context rot\n2. Thin Orchestrators \u2014 never do heavy lifting\n3. File-Based State \u2014 survives context resets\n4. Absent = Enabled \u2014 feature flags default to true\n5. Defense in Depth \u2014 plan-checker \u2192 executor \u2192 verifier \u2192 UAT\n\n## Agent Model\n- Orchestrator loads context via gsd-tools.cjs\n- Resolves model via gsd-tools.cjs resolve-model\n- Spawns agent with fresh context (up to 200K)\n- Collects result, updates state\n\n## Primary Agents (21)\n- Researchers: gsd-project-researcher, gsd-phase-researcher, gsd-ui-researcher, gsd-advisor-researcher\n- Synthesizers: gsd-research-synthesizer\n- Planners: gsd-planner, gsd-roadmapper\n- Checkers: gsd-plan-checker, gsd-integration-checker, gsd-ui-checker\n- Executors: gsd-executor\n- Verifiers: gsd-verifier\n- Mappers: gsd-codebase-mapper (4 parallel)\n- Debuggers: gsd-debugger\n- Auditors: gsd-ui-auditor, gsd-security-auditor\n- Doc Writers: gsd-doc-writer, gsd-doc-verifier\n- Profilers: gsd-user-profiler\n\n## Wave Execution\nDuring execute-phase, plans are grouped into dependency waves:\n- Plans with no deps \u2192 Wave 1 (parallel)\n- Plans depending on Wave 1 \u2192 Wave 2\n- Each executor gets fresh 200K context\n- Parallel commit safety via --no-verify + STATE.md file locking\n\n## Context Propagation\nPROJECT.md \u2192 All agents\nREQUIREMENTS.md \u2192 Planner, Verifier, Auditor\nROADMAP.md \u2192 Orchestrators\nSTATE.md \u2192 All agents (decisions, blockers)\nCONTEXT.md \u2192 Researcher, Planner, Executor\nRESEARCH.md \u2192 Planner, Plan Checker\nPLAN.md \u2192 Executor, Plan Checker\nSUMMARY.md \u2192 Verifier, State tracking\n",
+        "backlinks": [
+          "article:frameworks/gsd/index"
+        ]
+      }
+    },
+    {
+      "id": "article:frameworks/gsd/README",
+      "type": "article",
+      "name": "GSD - Get Shit Done Redux",
+      "filePath": "frameworks/gsd/README.md",
+      "summary": "GSD is a meta-prompting and context engineering system for AI code editors. It provides structured workflows for Claude Code, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Cursor, Windsurf, and more.",
+      "tags": [
+        "domains",
+        "frameworks/gsd"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [],
+        "category": "Domains",
+        "content": "# GSD - Get Shit Done Redux\n\n## Overview\nGSD is a meta-prompting and context engineering system for AI code editors. It provides structured workflows for Claude Code, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Cursor, Windsurf, and more.\n\n**Key facts:**\n- npm package: `@opengsd/get-shit-done-redux`\n- 1.2K GitHub stars, 3,115 commits\n- MIT License\n- Works on Mac, Windows, Linux\n\n## Core Loop (6 Commands)\n1. `/gsd-new-project` \u2014 Questions \u2192 research \u2192 requirements \u2192 roadmap\n2. `/gsd-discuss-phase N` \u2014 Capture implementation decisions before planning\n3. `/gsd-plan-phase N` \u2014 Research + plan + verify (up to 3 iterations)\n4. `/gsd-execute-phase N` \u2014 Execute plans in parallel waves\n5. `/gsd-verify-work N` \u2014 Manual acceptance testing\n6. `/gsd-ship N` \u2014 Create PR from verified phase work\n\n## Solves 3 Problems\n1. **Context bloat**: GSD keeps main context clean by doing heavy work in fresh subagent contexts\n2. **No shared memory**: PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md, CONTEXT.md persist across sessions\n3. **No verification**: Verify step walks through what was built, diagnoses failures\n\n## State Files (.planning/)\n- PROJECT.md \u2014 Vision\n- REQUIREMENTS.md \u2014 Scope with REQ-IDs\n- ROADMAP.md \u2014 Where you're going\n- STATE.md \u2014 Current position and decisions\n- CONTEXT.md \u2014 Per-phase implementation decisions\n- config.json \u2014 Model profiles, workflow toggles\n\n## Architecture\n- **Fresh Context Per Agent**: Every spawned agent gets a clean 200K token window\n- **Thin Orchestrators**: Workflow files load context, spawn agents, collect results, update state\n- **File-Based State**: All state in .planning/ as Markdown and JSON\n- **Wave Execution Model**: Plans grouped into dependency waves, executed in parallel\n- **33 agents, 86 commands, 11 hooks**\n",
+        "backlinks": [
+          "article:concepts/ai-sdlc"
+        ]
+      }
+    },
+    {
+      "id": "article:frameworks/gsd/USER-GUIDE",
+      "type": "article",
+      "name": "GSD User Guide",
+      "filePath": "frameworks/gsd/USER-GUIDE.md",
+      "summary": "`/gsd-new-project` \u2014 Questions about your idea \u2192 parallel research agents \u2192 requirements \u2192 roadmap",
+      "tags": [
+        "frameworks/gsd"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [],
+        "content": "# GSD User Guide\n\n## End-to-End Walkthrough\n\n### 1. Create Project\n`/gsd-new-project` \u2014 Questions about your idea \u2192 parallel research agents \u2192 requirements \u2192 roadmap\n\n### 2. Discuss Phase\n`/gsd-discuss-phase 1` \u2014 Capture implementation preferences before planning\n\n### 3. Plan Phase\n`/gsd-plan-phase 1` \u2014 Research agent \u2192 Planner \u2192 Plan Checker (up to 3 iterations)\n- Produces: RESEARCH.md, PLAN.md files, VALIDATION.md\n\n### 4. Execute Phase\n`/gsd-execute-phase 1` \u2014 Wave analysis \u2192 Executor per plan \u2192 atomic commits \u2192 Verifier\n- Each executor gets fresh 200K context window\n- Parallel waves where dependencies allow\n- Produces: SUMMARY.md per plan, VERIFICATION.md\n\n### 5. Verify Work\n`/gsd-verify-work 1` \u2014 Extract deliverables, walk through them, diagnose failures\n\n### 6. Ship\n`/gsd-ship 1` \u2014 Push branch, create PR with auto-generated body\n\n## Workflow Diagrams\n- Full Project Lifecycle: init \u2192 (discuss \u2192 ui? \u2192 plan \u2192 execute \u2192 verify) \u2192 ship \u2192 audit \u2192 complete \u2192 next\n- Planning Agent Coordination: 4 parallel researchers \u2192 Planner \u2192 Plan Checker (loop up to 3x)\n- Validation (Nyquist Layer): Map automated test coverage per requirement before code is written\n\n## Multi-Runtime Support\nGSD supports 15 runtimes: Claude Code, OpenCode, Kilo, Gemini CLI, Codex, Copilot, Antigravity, Trae, Cline, Augment Code, Cursor, Windsurf, Qwen Code, Hermes Agent, CodeBuddy\n\n## Namespace Routing (v1.40)\n6 namespace meta-skills: gsd-workflow, gsd-project, gsd-quality, gsd-context, gsd-manage, gsd-ideate\nEach routes to concrete sub-skills. Keeps eager skill-listing cost low (~120 tokens vs ~2,150).\n",
+        "backlinks": [
+          "article:frameworks/gsd/index"
+        ]
+      }
+    },
+    {
+      "id": "article:frameworks/gsd/index",
+      "type": "article",
+      "name": "GSD \u2014 Get Shit Done Redux",
+      "filePath": "frameworks/gsd/index.md",
+      "summary": "- [Overview](README.md) - [[ARCHITECTURE]] - [[USER-GUIDE]]",
+      "tags": [
+        "frameworks/gsd"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "ARCHITECTURE",
+          "USER-GUIDE"
+        ],
+        "content": "# GSD \u2014 Get Shit Done Redux\n\n> Meta-prompting and context engineering system for AI code editors.\n\n- [Overview](README.md)\n- [[ARCHITECTURE]]\n- [[USER-GUIDE]]\n\n## Quick Facts\n- npm: `@opengsd/get-shit-done-redux`\n- 1.2K GitHub stars, 3,115 commits\n- Supports 15 runtimes: Claude Code, OpenCode, Gemini CLI, Copilot, Cursor, etc.\n- 33 agents, 86 commands, 11 hooks\n\n## Core Loop\n1. `/gsd-new-project` \u2014 Initialize project\n2. `/gsd-discuss-phase N` \u2014 Capture decisions\n3. `/gsd-plan-phase N` \u2014 Research + plan + verify\n4. `/gsd-execute-phase N` \u2014 Execute in parallel waves\n5. `/gsd-verify-work N` \u2014 User acceptance testing\n6. `/gsd-ship N` \u2014 Create PR\n",
+        "backlinks": []
+      }
+    },
+    {
+      "id": "article:frameworks/omo/README",
+      "type": "article",
+      "name": "OMO (OhMyOpenAgent) Overview",
+      "filePath": "frameworks/omo/README.md",
+      "summary": "Oh My OpenAgent is a **multi-model agent orchestration harness** for OpenCode. It transforms a single AI agent into a coordinated development team.",
+      "tags": [
+        "domains",
+        "frameworks/omo"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [],
+        "category": "Domains",
+        "content": "# OMO (OhMyOpenAgent) Overview\n\n## What Is Oh My OpenAgent?\nOh My OpenAgent is a **multi-model agent orchestration harness** for OpenCode. It transforms a single AI agent into a coordinated development team.\n\n- 59K+ GitHub stars\n- Previously named \"oh-my-opencode\" (rename transition in progress)\n- TypeScript project\n- Dual-published as `oh-my-openagent` and `oh-my-opencode`\n\n## Key Agents\n| Agent | Role |\n|-------|------|\n| Sisyphus | Main orchestrator - delegates to subagents |\n| Prometheus | Planner - creates structured work plans |\n| Atlas | Executor - implements planned work |\n| Oracle | High-IQ consultant for architecture/debugging |\n| Librarian | Codebase research, documentation lookup |\n| Explore | Codebase search and pattern discovery |\n\n## Category-Based Model Routing\nWhen Sisyphus delegates to a subagent, it picks a **category** \u2014 not a model name. The category automatically maps to the right model.\n\n| Category | Purpose | Typical Model |\n|----------|---------|---------------|\n| visual-engineering | Frontend, UI/UX, styling | Gemini 3.1 Pro |\n| ultrabrain | Hard logic, architecture | GPT-5.5 |\n| deep | Autonomous research + execution | GPT-5.5 |\n| artistry | Creative problem-solving | Gemini 3.1 Pro |\n| quick | Trivial tasks, simple edits | GPT-5.4 Mini |\n| unspecified-low | Low-effort fallback | GPT-5.4 Mini |\n| unspecified-high | High-effort fallback | Claude Opus 4-7 |\n| writing | Documentation, prose | Claude Opus 4-7 |\n\n## Agents (11 Specialized)\nCustomize agent models, prompts, and permissions in `oh-my-openagent.jsonc`.\n\n## Key Tools\n- **call_omo_agent**: Spawn explore/librarian agents. Supports `run_in_background`.\n- **task()**: Category-based delegation. Supports categories + skills.\n",
+        "backlinks": [
+          "article:concepts/ai-sdlc"
+        ]
+      }
+    },
+    {
+      "id": "article:frameworks/omo/index",
+      "type": "article",
+      "name": "OMO \u2014 OhMyOpenAgent",
+      "filePath": "frameworks/omo/index.md",
+      "summary": "- [Overview](README.md)",
+      "tags": [
+        "frameworks/omo"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "code-yeongyu/oh-my-openagent"
+        ],
+        "content": "# OMO \u2014 OhMyOpenAgent\n\n> Multi-model agent orchestration harness for OpenCode.\n\n- [Overview](README.md)\n\n## Quick Facts\n- GitHub: [[code-yeongyu/oh-my-openagent]]\n- 59K GitHub stars\n- Previously named \"oh-my-opencode\"\n- TypeScript project\n\n## Agent Categories\n| Category | Use Case |\n|----------|----------|\n| visual-engineering | Frontend, UI/UX, styling |\n| ultrabrain | Hard logic, architecture |\n| deep | Autonomous research + execution |\n| artistry | Creative problem-solving |\n| quick | Trivial tasks, simple edits |\n| unspecified-low | Low-effort fallback |\n| unspecified-high | High-effort fallback |\n| writing | Documentation, prose |\n\n## Key Agents\n- **Sisyphus** \u2014 Main orchestrator\n- **Prometheus** \u2014 Planner\n- **Atlas** \u2014 Executor\n- **Oracle** \u2014 High-IQ consultant\n- **Librarian** \u2014 Codebase research\n- **Explore** \u2014 Codebase search\n",
+        "backlinks": []
+      }
+    },
+    {
+      "id": "topic:domains",
+      "type": "topic",
+      "name": "Domains",
+      "summary": "Category from index: Domains (3 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "topic:quick-links",
+      "type": "topic",
+      "name": "Quick Links",
+      "summary": "Category from index: Quick Links (0 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "article:concepts/ai-sdlc",
+      "target": "article:frameworks/gsd/README",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:concepts/ai-sdlc",
+      "target": "article:frameworks/omo/README",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:frameworks/gsd/index",
+      "target": "article:frameworks/gsd/ARCHITECTURE",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:frameworks/gsd/index",
+      "target": "article:frameworks/gsd/USER-GUIDE",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:frameworks/gsd/README",
+      "target": "topic:domains",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:frameworks/omo/README",
+      "target": "topic:domains",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:concepts/ai-sdlc",
+      "target": "topic:domains",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ],
+  "warnings": [
+    "Unresolved wikilink: [[code-yeongyu/oh-my-openagent]] in frameworks/omo/index.md"
+  ]
+}
